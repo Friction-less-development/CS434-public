@@ -1,5 +1,6 @@
 import numpy as np
 
+np.set_printoptions(suppress=True)
 X = np.zeros(shape=(1,14)) # 13 if without dummy column, else 14.
 Y = np.zeros(shape=(1,1))
 
@@ -29,8 +30,8 @@ with open('housing_train.txt','r') as f:
 XT = np.transpose(X)
 # print XT
 # print "---"
-newMatrix = np.dot(X, XT)
-XInv = np.linalg.inv(newMatrix)
+XTX = np.dot(XT, X)
+XInv = np.linalg.inv(XTX)
 # print XInv
 # XTY = np.dot(XT, Y)
 # print "---"
@@ -38,7 +39,7 @@ XInv = np.linalg.inv(newMatrix)
 # print "---"
 # print XT.shape
 # print Y.shape
-XInvY = np.dot(XInv, Y)
-w = np.dot(XT, XInvY)
+XInvXT = np.dot(XInv, XT)
+w = np.dot(XInvXT, Y)
 print "W: "
 print w

@@ -11,10 +11,10 @@ with open('housing_train.txt','r') as f:
     	averageValue = []
         for word in line.split():
            if featureNum < 13:
-           	lineWords.append(word)
+           	lineWords.append(float(word))
            	featureNum += 1
            else:
-           	averageValue.append(word)
+           	averageValue.append(float(word))
         if firstLine:
         	X[0] = lineWords
         	Y[0] = averageValue
@@ -22,5 +22,23 @@ with open('housing_train.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-print X #for testing purposes
-print Y[-1] # for testing purposes
+# print X #for testing purposes
+# print "---"
+# print Y[-1] # for testing purposes
+# print "---"
+XT = np.transpose(X)
+# print XT
+# print "---"
+newMatrix = np.dot(X, XT)
+XInv = np.linalg.inv(newMatrix)
+# print XInv
+# XTY = np.dot(XT, Y)
+# print "---"
+# print XTY
+# print "---"
+# print XT.shape
+# print Y.shape
+XInvY = np.dot(XInv, Y)
+w = np.dot(XT, XInvY)
+print "W: "
+print w

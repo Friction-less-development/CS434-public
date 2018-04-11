@@ -1,15 +1,14 @@
 import numpy as np
 
-X = np.zeros(shape=(1,13)) # 13 if without dummy column, else 14.
+X = np.zeros(shape=(1,14)) # 13 if without dummy column, else 14.
 Y = np.zeros(shape=(1,1))
 
 firstLine = True
 with open('housing_train.txt','r') as f:
     for line in f:
     	featureNum = 0
-    	lineWords = []
+    	lineWords = [1.] # used to add a 1s to the first column (dummy variable)
     	averageValue = []
-    	# lineWords = [1.] # used to add a 1s to the first column (dummy variable)
         for word in line.split():
            if featureNum < 13:
            	lineWords.append(word)

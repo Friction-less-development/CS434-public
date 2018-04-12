@@ -4,11 +4,16 @@ import matplotlib as mpl
 mpl.use('Agg')
 
 import matplotlib.pyplot as plt
-
+import matplotlib.patches as mpatches
 #Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
 #Sources: https://matplotlib.org/users/pyplot_tutorial.html
 #	https://stackoverflow.com/questions/13336823/matplotlib-python-error
-#	
+
+#HOW TO RUN: python p1.py
+#	For parts 1-3 it will say which part it is outputting, to help make it clear
+#	it will output the data required for part 1, 2 and 3, saying it is with or without a dummy variable, and if it is training or test data
+#	lastly it will output p1part4.png which is the graph for part 4
+
 #Question 1 Linear Regression
 
 avgTrainList = [] # hold the values of avg ASE for training
@@ -205,7 +210,7 @@ print "Test without dummy variable: Average sum of squares: ", avgSum
 avgTestList.append(float(avgSum))
 
 # part 4
-print "\nPart 4"
+# print "\nPart 4"
 mu, sigma = 0, 0.1 # mean and standard deviation
 s = np.random.normal(mu, sigma, 433) # training
 s2 = np.random.normal(mu, sigma, 433) # training
@@ -255,8 +260,8 @@ for i in range(0, 433):
 	avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 avgSum = avgSum / 433
-print "Training with d=2:"
-print "Average sum of squares: ", avgSum
+# print "Training with d=2:"
+# print "Average sum of squares: ", avgSum
 
 avgTrainList.append(float(avgSum))
 
@@ -305,8 +310,8 @@ for i in range(0, 74):
 	avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 avgSum = avgSum / 74
-print "Test with d=2:"
-print "Average sum of squares: ", avgSum
+# print "Test with d=2:"
+# print "Average sum of squares: ", avgSum
 avgTestList.append(float(avgSum))
 
 for k in range(4, 12, 2):
@@ -367,8 +372,8 @@ for k in range(4, 12, 2):
 		avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 	avgSum = avgSum / 433
-	print "Training with d=", k
-	print "Average sum of squares: ", avgSum
+	# print "Training with d=", k
+	# print "Average sum of squares: ", avgSum
 
 	avgTrainList.append(float(avgSum))
 
@@ -419,19 +424,22 @@ for k in range(4, 12, 2):
 		avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 	avgSum = avgSum / 74
-	print "Test with d=", k
-	print "Average sum of squares: ", avgSum
+	# print "Test with d=", k
+	# print "Average sum of squares: ", avgSum
 	avgTestList.append(float(avgSum))
 
 # print "avgTrainList: ", avgTrainList
 # print "avgTestList: ", avgTestList
-print "Legend for graph:"
-print "Red is training data"
-print "Blue is test data"
+
 plt.figure(1)
 plt.ylabel('ASE')
 plt.xlabel('Additional d features')
-plt.plot(0, avgTrainList[0], 'ro', 2, avgTrainList[1], 'ro', 4, avgTrainList[2], 'ro', 6, avgTrainList[3], 'ro', 8, avgTrainList[4], 'ro', 10, avgTrainList[5], 'ro')
-plt.plot(0, avgTestList[0], 'bo', 2, avgTestList[1], 'bo', 4, avgTestList[2], 'bo', 6, avgTestList[3], 'bo', 8, avgTestList[4], 'bo', 10, avgTestList[5], 'bo')
+xAxis = [0, 2, 4, 6, 8, 10]
+plt.plot(xAxis, avgTrainList, 'ro', label='Training Data')
+plt.plot(xAxis, avgTestList, 'bo', label='Test Data')
+# plt.plot(0, avgTrainList[0], 'ro', 2, avgTrainList[1], 'ro', 4, avgTrainList[2], 'ro', 6, avgTrainList[3], 'ro', 8, avgTrainList[4], 'ro', 10, avgTrainList[5], 'ro')
+# plt.plot(0, avgTestList[0], 'bo', 2, avgTestList[1], 'bo', 4, avgTestList[2], 'bo', 6, avgTestList[3], 'bo', 8, avgTestList[4], 'bo', 10, avgTestList[5], 'bo')
+
 plt.axis([0,12, 0, 30])
+plt.legend()
 plt.savefig('p1part4.png')

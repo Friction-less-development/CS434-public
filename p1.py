@@ -8,6 +8,8 @@ import matplotlib.patches as mpatches
 #Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
 #Sources: https://matplotlib.org/users/pyplot_tutorial.html
 #	https://stackoverflow.com/questions/13336823/matplotlib-python-error
+#	https://matplotlib.org/tutorials/intermediate/legend_guide.html#sphx-glr-tutorials-intermediate-legend-guide-py
+#	https://matplotlib.org/users/pyplot_tutorial.html
 
 #HOW TO RUN: python p1.py
 #	For parts 1-3 it will say which part it is outputting, to help make it clear
@@ -435,6 +437,7 @@ plt.figure(1)
 plt.ylabel('ASE')
 plt.xlabel('Additional d features')
 xAxis = [0, 2, 4, 6, 8, 10]
+plt.title('ASE VS Number of Additional Features')
 plt.plot(xAxis, avgTrainList, 'ro', label='Training Data')
 plt.plot(xAxis, avgTestList, 'bo', label='Test Data')
 # plt.plot(0, avgTrainList[0], 'ro', 2, avgTrainList[1], 'ro', 4, avgTrainList[2], 'ro', 6, avgTrainList[3], 'ro', 8, avgTrainList[4], 'ro', 10, avgTrainList[5], 'ro')

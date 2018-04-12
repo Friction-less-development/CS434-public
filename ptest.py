@@ -11,3 +11,18 @@ XInv = np.linalg.inv(xtx)
 XInvXT = np.dot(XInv, xt)
 w = np.dot(XInvXT, y)
 print w
+sumSq = 0.0
+for i in range(0, 3):
+	x[:,i] *= w[i]
+
+# calculate sum of squares (SSE)
+for j in range(0, 15):
+	sumSq += (y[j]-(x[j][1]+x[j][2]+x[j][0]))*(y[j]-(x[j][1]+x[j][2]+x[j][0]))
+	print y[j]
+	print x[j][1]
+	print x[j][2]
+	print x[j][0]
+	print "---"
+
+print x
+print sumSq # sum of sqaures

@@ -1,7 +1,18 @@
 import numpy as np
+import matplotlib as mpl
+
+mpl.use('Agg')
+
+import matplotlib.pyplot as plt
 
 #Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
+#Sources: https://matplotlib.org/users/pyplot_tutorial.html
+#	https://stackoverflow.com/questions/13336823/matplotlib-python-error
+#	
 #Question 1 Linear Regression
+
+avgTrainList = [] # hold the values of avg ASE for training
+avgTestList = [] # hold the values of avg ASE for test
 
 # part 1-2 with dummy variable
 np.set_printoptions(suppress=True)
@@ -27,27 +38,14 @@ with open('housing_train.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
+
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
 print "Training with dummy variable: W: "
 print w
-# print X
 
 for i in range(0, 14):
 	X[:,i] *= w[i]
@@ -86,27 +84,14 @@ with open('housing_test.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
+
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
 print "Test with dummy variable: W: "
 print w
-# print X
 
 for i in range(0, 14):
 	X[:,i] *= w[i]
@@ -146,27 +131,14 @@ with open('housing_train.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
+
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
 print "Training without dummy variable: W: "
 print w
-# print X
 
 for i in range(0, 13):
 	X[:,i] *= w[i]
@@ -181,6 +153,7 @@ for i in range(0, 433):
 
 avgSum = avgSum / 433
 print "Training without dummy variable: Average sum of squares: ", avgSum
+avgTrainList.append(float(avgSum))
 
 #test data without dummy variable
 X = np.zeros(shape=(1,13)) # 14 with dummy variable
@@ -205,22 +178,11 @@ with open('housing_test.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
+
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
+
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
 print "Test without dummy variable: W: "
@@ -240,10 +202,10 @@ for i in range(0, 74):
 
 avgSum = avgSum / 74
 print "Test without dummy variable: Average sum of squares: ", avgSum
-
+avgTestList.append(float(avgSum))
 
 # part 4
-print "Part 4"
+print "\nPart 4"
 mu, sigma = 0, 0.1 # mean and standard deviation
 s = np.random.normal(mu, sigma, 433) # training
 s2 = np.random.normal(mu, sigma, 433) # training
@@ -270,35 +232,16 @@ with open('housing_train.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X
-# print X.shape
-# print s.shape
+
 s.shape = (433, 1)
 s2.shape = (433, 1)
-# print s.shape
 X = np.append(X, s, 1)
 X = np.append(X, s2, 1)
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
-# print "Training with d=2 variables: W: "
-# print w
-# print X
 
 for i in range(0, 15):
 	X[:,i] *= w[i]
@@ -312,7 +255,10 @@ for i in range(0, 433):
 	avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 avgSum = avgSum / 433
-print "Training with d=2 variables: Average sum of squares: ", avgSum
+print "Training with d=2:"
+print "Average sum of squares: ", avgSum
+
+avgTrainList.append(float(avgSum))
 
 # test with d=2
 X = np.zeros(shape=(1,13))
@@ -336,35 +282,16 @@ with open('housing_test.txt','r') as f:
         else:
         	X = np.vstack((X, lineWords))
         	Y = np.vstack((Y, averageValue))
-# print X
-# print X.shape
-# print s.shape
+
 s3.shape = (74, 1)
 s4.shape = (74, 1)
-# print s3.shape
 X = np.append(X, s3, 1)
 X = np.append(X, s4, 1)
-# print X #for testing purposes
-# print "---"
-# print Y[-1] # for testing purposes
-# print "---"
 XT = np.transpose(X)
-# print XT
-# print "---"
 XTX = np.dot(XT, X)
 XInv = np.linalg.inv(XTX)
-# print XInv
-# XTY = np.dot(XT, Y)
-# print "---"
-# print XTY
-# print "---"
-# print XT.shape
-# print Y.shape
 XInvXT = np.dot(XInv, XT)
 w = np.dot(XInvXT, Y)
-# print "Test with d=2 variable: W: "
-# print w
-# print X
 
 for i in range(0, 15):
 	X[:,i] *= w[i]
@@ -378,4 +305,133 @@ for i in range(0, 74):
 	avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
 
 avgSum = avgSum / 74
-print "Test with d=2 variables: Average sum of squares: ", avgSum
+print "Test with d=2:"
+print "Average sum of squares: ", avgSum
+avgTestList.append(float(avgSum))
+
+for k in range(4, 12, 2):
+	colRange = k+13
+	sTrainList = []
+	sTestList = []
+	for j in range(0, k):
+		sTrainList.append(np.random.normal(mu, sigma, 433))
+		sTestList.append(np.random.normal(mu, sigma, 74))
+	# s = np.random.normal(mu, sigma, 433) # training
+	# s2 = np.random.normal(mu, sigma, 433) # training
+	# s3 = np.random.normal(mu, sigma, 74) # test
+	# s4 = np.random.normal(mu, sigma, 74) # test
+	X = np.zeros(shape=(1,13)) # 14 with dummy variable
+	Y = np.zeros(shape=(1,1))
+	firstLine = True
+	with open('housing_train.txt','r') as f:
+	    for line in f:
+	    	featureNum = 0
+	    	lineWords = []
+	    	averageValue = []
+	        for word in line.split():
+	           if featureNum < 13:
+	           	lineWords.append(float(word))
+	           	featureNum += 1
+	           else:
+	           	averageValue.append(float(word))
+	        if firstLine:
+	        	X[0] = lineWords
+	        	Y[0] = averageValue
+	        	firstLine = False
+	        else:
+	        	X = np.vstack((X, lineWords))
+	        	Y = np.vstack((Y, averageValue))
+	for j in range(0, k):
+		sTrainList[j].shape = (433, 1)
+	# s.shape = (433, 1)
+	# s2.shape = (433, 1)
+	for j in range(0, k):
+		X = np.append(X, sTrainList[j], 1)
+	# X = np.append(X, s, 1)
+	# X = np.append(X, s2, 1)
+	XT = np.transpose(X)
+	XTX = np.dot(XT, X)
+	XInv = np.linalg.inv(XTX)
+	XInvXT = np.dot(XInv, XT)
+	w = np.dot(XInvXT, Y)
+
+	for i in range(0, colRange):
+		X[:,i] *= w[i]
+	avgSum = 0.0
+	columnSum = 0.0
+	# get average SSE
+	for i in range(0, 433):
+		columnSum = 0.0
+		for j in range(0, colRange):
+			columnSum += X[i][j]
+		avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
+
+	avgSum = avgSum / 433
+	print "Training with d=", k
+	print "Average sum of squares: ", avgSum
+
+	avgTrainList.append(float(avgSum))
+
+	X = np.zeros(shape=(1,13))
+	Y = np.zeros(shape=(1,1))
+	firstLine = True
+	with open('housing_test.txt','r') as f:
+	    for line in f:
+	    	featureNum = 0
+	    	lineWords = []
+	    	averageValue = []
+	        for word in line.split():
+	           if featureNum < 13:
+	           	lineWords.append(float(word))
+	           	featureNum += 1
+	           else:
+	           	averageValue.append(float(word))
+	        if firstLine:
+	        	X[0] = lineWords
+	        	Y[0] = averageValue
+	        	firstLine = False
+	        else:
+	        	X = np.vstack((X, lineWords))
+	        	Y = np.vstack((Y, averageValue))
+	for j in range(0, k):
+		sTestList[j].shape = (74, 1)
+	# s3.shape = (74, 1)
+	# s4.shape = (74, 1)
+	for j in range(0, k):
+		X = np.append(X, sTestList[j], 1)
+	# X = np.append(X, s3, 1)
+	# X = np.append(X, s4, 1)
+	XT = np.transpose(X)
+	XTX = np.dot(XT, X)
+	XInv = np.linalg.inv(XTX)
+	XInvXT = np.dot(XInv, XT)
+	w = np.dot(XInvXT, Y)
+
+	for i in range(0, colRange):
+		X[:,i] *= w[i]
+	avgSum = 0.0
+	columnSum = 0.0
+	# get average SSE
+	for i in range(0, 74):
+		columnSum = 0.0
+		for j in range(0, colRange):
+			columnSum += X[i][j]
+		avgSum += (Y[i][0]-columnSum)*(Y[i][0]-columnSum)
+
+	avgSum = avgSum / 74
+	print "Test with d=", k
+	print "Average sum of squares: ", avgSum
+	avgTestList.append(float(avgSum))
+
+# print "avgTrainList: ", avgTrainList
+# print "avgTestList: ", avgTestList
+print "Legend for graph:"
+print "Red is training data"
+print "Blue is test data"
+plt.figure(1)
+plt.ylabel('ASE')
+plt.xlabel('Additional d features')
+plt.plot(0, avgTrainList[0], 'ro', 2, avgTrainList[1], 'ro', 4, avgTrainList[2], 'ro', 6, avgTrainList[3], 'ro', 8, avgTrainList[4], 'ro', 10, avgTrainList[5], 'ro')
+plt.plot(0, avgTestList[0], 'bo', 2, avgTestList[1], 'bo', 4, avgTestList[2], 'bo', 6, avgTestList[3], 'bo', 8, avgTestList[4], 'bo', 10, avgTestList[5], 'bo')
+plt.axis([0,12, 0, 30])
+plt.savefig('p1part4.png')

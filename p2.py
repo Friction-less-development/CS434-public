@@ -1,4 +1,3 @@
-
 import numpy as np
 from math import exp
 import csv
@@ -48,7 +47,21 @@ def linReg(learningRate, iterations, xSet, ySet):
     
     return w
 
-    
+def predict(xSet, weightVector):
+    yPredictions = sigmoid(xSet, weightVector)
+    for i in range (0, len(yPredictions)):
+        if yPredictions[i] < .5:
+            yPredictions[i] = 0
+        else:
+            yPredictions[i] = 1
+    return yPredictions
+
+def accuracy(predictions, actual):
+    nums = []
+    for i in range (len(predictions)):
+        nums.append(np.abs(predictions[i]- actual[i]))
+    return 100 - np.mean(nums) * 100
+
 
 # Calculate coefficients
 dataset = X
@@ -58,7 +71,7 @@ n_epoch = 1000
 
 # test with sklearn 
 model = LogisticRegression()
-model.fit(X,y)
+model.fit(X,np.ravel(y))
 print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
 
 
@@ -66,7 +79,6 @@ learnedWeights = linReg(.001, 100, X, y)
 
 print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
+predictions = predict(X, learnedWeights)
 
-# print(learnedWeights)
-
-
+print("Accuracy: ", accuracy(predictions, y))

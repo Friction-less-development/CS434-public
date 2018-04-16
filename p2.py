@@ -2,6 +2,12 @@ import numpy as np
 from math import exp
 import csv
 from sklearn.linear_model import LogisticRegression
+import matplotlib as mpl
+
+mpl.use('Agg')
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 np.set_printoptions(suppress=True)
@@ -85,18 +91,18 @@ print("Accuracy: ", accuracy(predictions, y))
 
 
 # # Experiment with different learning rates and note gradient convergence
-# learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-# learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-# learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-
-
+learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
+predictions = predict(X, learnedWeights)
 print("Accuracy: ", accuracy(predictions, y))
+learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
+predictions = predict(X, learnedWeights)
+print("Accuracy: ", accuracy(predictions, y))
+learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
+predictions = predict(X, learnedWeights)
+print("Accuracy: ", accuracy(predictions, y))
+
+
+# print("Accuracy: ", accuracy(predictions, y))
 
 X = np.zeros(shape=(800,256))
 y = np.zeros(shape=(800,1))
@@ -123,3 +129,29 @@ X = np.divide(X, 255)
 predictions = predict(X, learnedWeights)
 
 print("Accuracy: ", accuracy(predictions, y))
+
+
+plt.figure(1)
+plt.subplot(311)
+plt.ylabel('Gradient Magnitude')
+plt.xlabel('Iterations')
+xAxis = range(100)
+plt.title('Gradient Magnitude VS Iterations: Learning Rate = 01')
+plt.plot(xAxis, gradientMagnitudeDataPoint01, 'ro', label='Training Data')
+plt.legend()
+plt.subplot(312)
+plt.ylabel('Gradient Magnitude')
+plt.xlabel('Iterations')
+plt.title('Gradient Magnitude VS Iterations: Learning Rate = 001')
+plt.plot(xAxis, gradientMagnitudeDataPoint001, 'ro', label='Training Data')
+plt.legend()
+plt.subplot(313)
+plt.ylabel('Gradient Magnitude')
+plt.xlabel('Iterations')
+plt.title('Gradient Magnitude VS Iterations: Learning Rate = 0001')
+plt.tight_layout()
+plt.plot(xAxis, gradientMagnitudeDataPoint0001, 'ro', label='Training Data')
+plt.legend()
+plt.savefig('p2part1.png')
+
+print("\n\ndone")

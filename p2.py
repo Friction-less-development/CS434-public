@@ -1,3 +1,8 @@
+#Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
+
+#HOW TO RUN: python p2.py
+#Folder must contain usps-4-9-train.csv and usps-4-9-test.csv data files
+
 import numpy as np
 from math import exp
 import csv
@@ -10,7 +15,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-# training data
+# read training data
 np.set_printoptions(suppress=True)
 X = np.zeros(shape=(1400,256))
 y = np.zeros(shape=(1400,1))
@@ -34,7 +39,7 @@ with open('usps-4-9-train.csv','r') as csvfile:
 
 X = np.divide(X, 255)
 
-# test data
+# read test data
 X_test = np.zeros(shape=(800,256))
 y_test = np.zeros(shape=(800,1))
 firstLine = 0
@@ -76,7 +81,7 @@ def linReg(learningRate, iterations, xSet, ySet):
 
 # batch learning logistic regression with regularization
 def linRegWithRegularization(learningRate, iterations, xSet, ySet):
-    lam = .01
+    lam = .001
     w = np.zeros(256)
     for iteration in range (0, iterations):
         delVector = np.zeros(256)
@@ -92,6 +97,7 @@ def linRegWithRegularization(learningRate, iterations, xSet, ySet):
 
     return w
 
+# calculate predictions given a weight vector
 def predict(xSet, weightVector):
     yPredictions = sigmoid(xSet, weightVector)
     for i in range (0, len(yPredictions)):
@@ -101,6 +107,7 @@ def predict(xSet, weightVector):
             yPredictions[i] = 1
     return yPredictions
 
+# calculate accuracy
 def accuracy(predictions, actual):
     nums = np.zeros(len(predictions))
     for i in range (len(predictions)):
@@ -108,29 +115,28 @@ def accuracy(predictions, actual):
     #print(np.mean(nums, dtype=np.float32))
     return 100.0 - np.mean(nums) * 100.0
 
-# test with sklearn
-model = LogisticRegression()
-model.fit(X,np.ravel(y))
-print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
-
-
-learnedWeights = linReg(.001, 50, X, y)
-print("First 5 of our model's coefs: ", learnedWeights[0:5])
+# # Test model by comparing with sklearn's logistic regression function
+# model = LogisticRegression()
+# model.fit(X,np.ravel(y))
+# print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
+# learnedWeights = linReg(.001, 100, X, y)
+# print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
 print("\n\n")
 
+print("Logistic regression: \n")
+learnedWeights = linReg(.001, 100, X, y)
 predictions = predict(X, learnedWeights)
-print("Train accuracy: ", accuracy(predictions, y))
-
+print("Training set accuracy: ", round(accuracy(predictions, y), 1))
 predictions = predict(X_test, learnedWeights)
-print("Test accuracy: ", accuracy(predictions, y_test))
+print("Test set accuracy: ", accuracy(predictions, y_test))
 
 
-print("\n\n")
+print("\n")
 
-learnedWeights = linRegWithRegularization(.001, 50, X, y)
+print("Logistic regression with regularization: \n")
+learnedWeights = linRegWithRegularization(.001, 100, X, y)
 predictions = predict(X, learnedWeights)
-print("Train accuracy: ", accuracy(predictions, y))
-
+print("Training set accuracy: ", round(accuracy(predictions, y),1))
 predictions = predict(X_test, learnedWeights)
-print("Test accuracy: ", accuracy(predictions, y_test))
+print("Test set accuracy: ", accuracy(predictions, y_test))

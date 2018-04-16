@@ -66,7 +66,7 @@ def sigmoid(x, w):
     yhat = 1 / (1 + np.exp(-(np.dot(x, w))))
     return yhat
 
-# batch learning logistic regression
+# Gradient descent: batch learning logistic regression
 def linReg(learningRate, iterations, xSet, ySet):
     w = np.zeros(256)
     for iteration in range (0, iterations):
@@ -79,7 +79,7 @@ def linReg(learningRate, iterations, xSet, ySet):
 
     return w
 
-# batch learning logistic regression with regularization
+# Gradient descent: batch learning logistic regression with regularization
 def linRegWithRegularization(learningRate, iterations, xSet, ySet):
     lam = .001
     w = np.zeros(256)
@@ -122,18 +122,16 @@ def accuracy(predictions, actual):
 # learnedWeights = linReg(.001, 100, X, y)
 # print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
-print("\n\n")
 
+#print results
+print("\n\n")
 print("Logistic regression: \n")
 learnedWeights = linReg(.001, 100, X, y)
 predictions = predict(X, learnedWeights)
 print("Training set accuracy: ", round(accuracy(predictions, y), 1))
 predictions = predict(X_test, learnedWeights)
 print("Test set accuracy: ", accuracy(predictions, y_test))
-
-
 print("\n")
-
 print("Logistic regression with regularization: \n")
 learnedWeights = linRegWithRegularization(.001, 100, X, y)
 predictions = predict(X, learnedWeights)

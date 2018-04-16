@@ -63,8 +63,6 @@ def sigmoid(x, w):
 
 # batch learning logistic regression
 def linReg(learningRate, iterations, xSet, ySet):
-    gradientMagnitudeVector = []
-
     w = np.zeros(256)
     for iteration in range (0, iterations):
         delVector = np.zeros(256)
@@ -72,18 +70,13 @@ def linReg(learningRate, iterations, xSet, ySet):
             yhat = sigmoid(X[i], w)
             yhatMinusYi = np.subtract(yhat, ySet[i])
             delVector = np.add(delVector, np.multiply(yhatMinusYi, X[i]))
-        gradientMagnitudeVector.append(np.linalg.norm(delVector))
         w = np.subtract(w, np.multiply(learningRate, delVector))
 
-    #print(gradientMagnitudeVector)
-
-    return w, gradientMagnitudeVector
+    return w
 
 # batch learning logistic regression with regularization
 def linRegWithRegularization(learningRate, iterations, xSet, ySet):
     lam = .01
-    gradientMagnitudeVector = []
-
     w = np.zeros(256)
     for iteration in range (0, iterations):
         delVector = np.zeros(256)
@@ -91,17 +84,13 @@ def linRegWithRegularization(learningRate, iterations, xSet, ySet):
             yhat = sigmoid(X[i], w)
             yhatMinusYi = np.subtract(yhat, ySet[i])
             delVector = np.add(delVector, np.multiply(yhatMinusYi, X[i]))
-        gradientMagnitudeVector.append(np.linalg.norm(delVector))
-        
-        
+
         regularize = np.linalg.norm(np.linalg.norm(w))
         regularize = np.multiply(float(.5), np.multiply(lam, regularize))
-        
+
         w = np.add(np.subtract(w, np.multiply(learningRate, delVector)) , regularize)
 
-    #print(gradientMagnitudeVector)
-
-    return w, gradientMagnitudeVector
+    return w
 
 def predict(xSet, weightVector):
     yPredictions = sigmoid(xSet, weightVector)
@@ -115,16 +104,9 @@ def predict(xSet, weightVector):
 def accuracy(predictions, actual):
     nums = np.zeros(len(predictions))
     for i in range (len(predictions)):
-        nums[i] = (float(np.abs(predictions[i]- actual[i])))  
+        nums[i] = (float(np.abs(predictions[i]- actual[i])))
     #print(np.mean(nums, dtype=np.float32))
     return 100.0 - np.mean(nums) * 100.0
-
-
-# Calculate coefficients
-dataset = X
-l_rate = 0.3
-n_epoch = 1000
-
 
 # test with sklearn
 model = LogisticRegression()
@@ -132,7 +114,7 @@ model.fit(X,np.ravel(y))
 print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
 
 
-learnedWeights, gradientMagnitudeData = linReg(.001, 50, X, y)
+learnedWeights = linReg(.001, 50, X, y)
 print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
 print("\n\n")
@@ -146,46 +128,9 @@ print("Test accuracy: ", accuracy(predictions, y_test))
 
 print("\n\n")
 
-learnedWeights, gradientMagnitudeData = linRegWithRegularization(.001, 50, X, y)
+learnedWeights = linRegWithRegularization(.001, 50, X, y)
 predictions = predict(X, learnedWeights)
 print("Train accuracy: ", accuracy(predictions, y))
 
 predictions = predict(X_test, learnedWeights)
 print("Test accuracy: ", accuracy(predictions, y_test))
-
-
-
-# # Experiment with different learning rates and note gradient convergence
-# learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-# learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-# learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
-# predictions = predict(X, learnedWeights)
-# print("Accuracy: ", accuracy(predictions, y))
-
-
-# plt.figure(1)
-# plt.subplot(311)
-# plt.ylabel('Gradient Magnitude')
-# plt.xlabel('Iterations')
-# xAxis = range(100)
-# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 01')
-# plt.plot(xAxis, gradientMagnitudeDataPoint01, 'ro', label='Training Data')
-# plt.legend()
-# plt.subplot(312)
-# plt.ylabel('Gradient Magnitude')
-# plt.xlabel('Iterations')
-# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 001')
-# plt.plot(xAxis, gradientMagnitudeDataPoint001, 'ro', label='Training Data')
-# plt.legend()
-# plt.subplot(313)
-# plt.ylabel('Gradient Magnitude')
-# plt.xlabel('Iterations')
-# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 0001')
-# plt.tight_layout()
-# plt.plot(xAxis, gradientMagnitudeDataPoint0001, 'ro', label='Training Data')
-# plt.legend()
-# plt.savefig('p2part1.png')

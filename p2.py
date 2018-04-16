@@ -94,7 +94,7 @@ def linRegWithRegularization(learningRate, iterations, xSet, ySet):
         gradientMagnitudeVector.append(np.linalg.norm(delVector))
         
         
-        regularize = np.linalg.norm(np.power(w, 2))
+        regularize = np.linalg.norm(np.linalg.norm(w))
         regularize = np.multiply(float(.5), np.multiply(lam, regularize))
         
         w = np.add(np.subtract(w, np.multiply(learningRate, delVector)) , regularize)
@@ -113,10 +113,11 @@ def predict(xSet, weightVector):
     return yPredictions
 
 def accuracy(predictions, actual):
-    nums = []
+    nums = np.zeros(len(predictions))
     for i in range (len(predictions)):
-        nums.append(np.abs(predictions[i]- actual[i]))
-    return 100 - np.mean(nums) * 100
+        nums[i] = (float(np.abs(predictions[i]- actual[i])))  
+    #print(np.mean(nums, dtype=np.float32))
+    return 100.0 - np.mean(nums) * 100.0
 
 
 # Calculate coefficients
@@ -131,7 +132,7 @@ model.fit(X,np.ravel(y))
 print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
 
 
-learnedWeights, gradientMagnitudeData = linReg(.001, 100, X, y)
+learnedWeights, gradientMagnitudeData = linReg(.001, 50, X, y)
 print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
 print("\n\n")
@@ -142,9 +143,10 @@ print("Train accuracy: ", accuracy(predictions, y))
 predictions = predict(X_test, learnedWeights)
 print("Test accuracy: ", accuracy(predictions, y_test))
 
+
 print("\n\n")
 
-learnedWeights, gradientMagnitudeData = linRegWithRegularization(.001, 100, X, y)
+learnedWeights, gradientMagnitudeData = linRegWithRegularization(.001, 50, X, y)
 predictions = predict(X, learnedWeights)
 print("Train accuracy: ", accuracy(predictions, y))
 
@@ -153,37 +155,37 @@ print("Test accuracy: ", accuracy(predictions, y_test))
 
 
 
-# Experiment with different learning rates and note gradient convergence
-learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
-predictions = predict(X, learnedWeights)
-print("Accuracy: ", accuracy(predictions, y))
-learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
-predictions = predict(X, learnedWeights)
-print("Accuracy: ", accuracy(predictions, y))
-learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
-predictions = predict(X, learnedWeights)
-print("Accuracy: ", accuracy(predictions, y))
+# # Experiment with different learning rates and note gradient convergence
+# learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
+# learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
+# learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
 
 
-plt.figure(1)
-plt.subplot(311)
-plt.ylabel('Gradient Magnitude')
-plt.xlabel('Iterations')
-xAxis = range(100)
-plt.title('Gradient Magnitude VS Iterations: Learning Rate = 01')
-plt.plot(xAxis, gradientMagnitudeDataPoint01, 'ro', label='Training Data')
-plt.legend()
-plt.subplot(312)
-plt.ylabel('Gradient Magnitude')
-plt.xlabel('Iterations')
-plt.title('Gradient Magnitude VS Iterations: Learning Rate = 001')
-plt.plot(xAxis, gradientMagnitudeDataPoint001, 'ro', label='Training Data')
-plt.legend()
-plt.subplot(313)
-plt.ylabel('Gradient Magnitude')
-plt.xlabel('Iterations')
-plt.title('Gradient Magnitude VS Iterations: Learning Rate = 0001')
-plt.tight_layout()
-plt.plot(xAxis, gradientMagnitudeDataPoint0001, 'ro', label='Training Data')
-plt.legend()
-plt.savefig('p2part1.png')
+# plt.figure(1)
+# plt.subplot(311)
+# plt.ylabel('Gradient Magnitude')
+# plt.xlabel('Iterations')
+# xAxis = range(100)
+# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 01')
+# plt.plot(xAxis, gradientMagnitudeDataPoint01, 'ro', label='Training Data')
+# plt.legend()
+# plt.subplot(312)
+# plt.ylabel('Gradient Magnitude')
+# plt.xlabel('Iterations')
+# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 001')
+# plt.plot(xAxis, gradientMagnitudeDataPoint001, 'ro', label='Training Data')
+# plt.legend()
+# plt.subplot(313)
+# plt.ylabel('Gradient Magnitude')
+# plt.xlabel('Iterations')
+# plt.title('Gradient Magnitude VS Iterations: Learning Rate = 0001')
+# plt.tight_layout()
+# plt.plot(xAxis, gradientMagnitudeDataPoint0001, 'ro', label='Training Data')
+# plt.legend()
+# plt.savefig('p2part1.png')

@@ -34,18 +34,34 @@ def sigmoid(x, w):
     return yhat
 
 def linReg(learningRate, iterations, xSet, ySet):
+<<<<<<< HEAD
     w = np.zeros(256)
+=======
+    gradientMagnitudeVector = []
+    
+    w = np.zeros(256)    
+>>>>>>> origin/master
     for iteration in range (0, iterations):
         delVector = np.zeros(256)
         for i in range (0, len(xSet)):
             yhat = sigmoid(X[i], w)
             yhatMinusYi = np.subtract(yhat, ySet[i])
+<<<<<<< HEAD
             delVector = np.add(delVector, np.multiply(yhatMinusYi, X[i]))
         w = np.subtract(w, np.multiply(learningRate, delVector))
 #         if(iteration%20 == 0):
 #             print("weights v2: ", w[0,0:5])
 
     return w
+=======
+            delVector = np.add(delVector, np.multiply(yhatMinusYi, X[i])) 
+        gradientMagnitudeVector.append(np.linalg.norm(delVector))
+        w = np.subtract(w, np.multiply(learningRate, delVector))
+
+    #print(gradientMagnitudeVector)
+    
+    return w, gradientMagnitudeVector
+>>>>>>> origin/master
 
 def predict(xSet, weightVector):
     yPredictions = sigmoid(xSet, weightVector)
@@ -75,12 +91,25 @@ model.fit(X,np.ravel(y))
 print("First 5 sklearn coefs:        ", model.coef_[0,0:5])
 
 
-learnedWeights = linReg(.001, 100, X, y)
-
+learnedWeights, gradientMagnitudeData = linReg(.001, 1000, X, y)
 print("First 5 of our model's coefs: ", learnedWeights[0:5])
-
 predictions = predict(X, learnedWeights)
+print("Accuracy: ", accuracy(predictions, y))
 
+
+# # Experiment with different learning rates and note gradient convergence
+# learnedWeights, gradientMagnitudeDataPoint0001 = linReg(.0001, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
+# learnedWeights, gradientMagnitudeDataPoint001 = linReg(.001, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
+# learnedWeights, gradientMagnitudeDataPoint01 = linReg(.01, 100, X, y)
+# predictions = predict(X, learnedWeights)
+# print("Accuracy: ", accuracy(predictions, y))
+
+
+<<<<<<< HEAD
 print("Accuracy: ", accuracy(predictions, y))
 
 X = np.zeros(shape=(800,256))
@@ -108,3 +137,6 @@ X = np.divide(X, 255)
 predictions = predict(X, learnedWeights)
 
 print("Accuracy: ", accuracy(predictions, y))
+=======
+print("\n\ndone")
+>>>>>>> origin/master

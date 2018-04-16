@@ -1,6 +1,6 @@
 #Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
 
-#HOW TO RUN: python p2.py
+#HOW TO RUN: python2.7 p2.py
 #Folder must contain usps-4-9-train.csv and usps-4-9-test.csv data files
 
 import numpy as np

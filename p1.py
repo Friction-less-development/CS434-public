@@ -11,7 +11,7 @@ import matplotlib.patches as mpatches
 #	https://matplotlib.org/tutorials/intermediate/legend_guide.html#sphx-glr-tutorials-intermediate-legend-guide-py
 #	https://matplotlib.org/users/pyplot_tutorial.html
 
-#HOW TO RUN: python p1.py
+#HOW TO RUN: python2.7 p1.py
 #	For parts 1-3 it will say which part it is outputting, to help make it clear
 #	it will output the data required for part 1, 2 and 3, saying it is with or without a dummy variable, and if it is training or test data
 #	lastly it will output p1part4.png which is the graph for part 4

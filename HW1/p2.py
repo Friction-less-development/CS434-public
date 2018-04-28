@@ -80,8 +80,8 @@ def linReg(learningRate, iterations, xSet, ySet):
     return w
 
 # Gradient descent: batch learning logistic regression with regularization
-def linRegWithRegularization(learningRate, iterations, xSet, ySet):
-    lam = .001
+def linRegWithRegularization(learningRate, iterations, xSet, ySet, l):
+    lam = l
     w = np.zeros(256)
     for iteration in range (0, iterations):
         delVector = np.zeros(256)
@@ -90,10 +90,7 @@ def linRegWithRegularization(learningRate, iterations, xSet, ySet):
             yhatMinusYi = np.subtract(yhat, ySet[i])
             delVector = np.add(delVector, np.multiply(yhatMinusYi, X[i]))
 
-        regularize = np.linalg.norm(np.linalg.norm(w))
-        regularize = np.multiply(float(.5), np.multiply(lam, regularize))
-
-        w = np.add(np.subtract(w, np.multiply(learningRate, delVector)) , regularize)
+        w = np.subtract(w, np.multiply(learningRate, np.add(np.multiply(lam, w), delVector)))
 
     return w
 
@@ -123,18 +120,29 @@ def accuracy(predictions, actual):
 # print("First 5 of our model's coefs: ", learnedWeights[0:5])
 
 
-#print results
-print("\n\n")
-print("Logistic regression: \n")
-learnedWeights = linReg(.001, 100, X, y)
+print("\n")
+lr = .001
+iterations = 100
+print("Learning rate: ", lr)
+print("iterations: ", iterations)
+print("\n")
+
+print("Running logistic regression: \n")
+learnedWeights = linReg(lr, iterations, X, y)
 predictions = predict(X, learnedWeights)
 print("Training set accuracy: ", round(accuracy(predictions, y), 1))
 predictions = predict(X_test, learnedWeights)
 print("Test set accuracy: ", accuracy(predictions, y_test))
-print("\n")
-print("Logistic regression with regularization: \n")
-learnedWeights = linRegWithRegularization(.001, 100, X, y)
-predictions = predict(X, learnedWeights)
-print("Training set accuracy: ", round(accuracy(predictions, y),1))
-predictions = predict(X_test, learnedWeights)
-print("Test set accuracy: ", accuracy(predictions, y_test))
+
+
+print("\n\nRunning logistic regression with regularization: \n")
+    
+for reg in [100, 10, 1, .1, .01, .001, .0001, .00001, .000001]:  
+    
+    learnedWeights = linRegWithRegularization(lr, iterations, X, y, reg)
+    print("\n")
+    print("lambda: ", reg)
+    predictions = predict(X, learnedWeights)
+    print("Training set accuracy: ", round(accuracy(predictions, y),1))
+    predictions = predict(X_test, learnedWeights)
+    print("Test set accuracy: ", accuracy(predictions, y_test))

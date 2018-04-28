@@ -44,6 +44,24 @@ with open('knn_train.csv','r') as f:
         else:
         	X = np.vstack((X, lineWords))
 
+#normalize data
+findMax = -1
+findMin = -1
+for i in range(1, 31):
+	for j in range(0, np.size(X, 0)):
+		if findMax == -1:
+			findMax = X[j][i]
+		elif findMax < X[j][i]:
+			findMax = X[j][i]
+		if findMin == -1:
+			findMin = X[j][i]
+		elif findMin > X[j][i]:
+			findMin = X[j][i]
+
+for i in range(1, 31):
+	for j in range(0, np.size(X, 0)):
+		X[j][i] = (X[j][i]-findMin)/float(findMax-findMin)
+
 #global
 bestStump = -1 # global, will be used to find the best overall decision stump
 hS = 0.0 # H(S) value, will be the same for no matter which column it is, because the number of positives/negatives overall will not change
@@ -60,14 +78,14 @@ rBranch = [] # used to store if something is negative/positive in right branch0
 
 rightBranch = [] # will be used to hold everything greater than greaterThan value
 leftBranch = []  # will be used to hold everything less than or equal to greaterThan value
-print X
+# print X
 # print Y
-print "\n"
+# print "\n"
 XSortTest = X[X[:,1].argsort()]
 Y = XSortTest[:, 1] # getting a single column, which might be useful for doing calculations on
-print XSortTest
-print "\n"
-print Y
+# print XSortTest
+# print "\n"
+# print Y
 
 for i in range(0, np.size(Y)):
 	if X[i][0] == 1:
@@ -187,7 +205,7 @@ for k in range(1, 31):
 			elif tempNewHS < bestStump:
 				bestStump = tempNewHS
 				bestGreaterThan = greaterThan
-				print "shouldn't get here"
+				bestColumn = k
 		elif rBranchLabel != rightBranchLabel or lBranchLabel != leftBranchLabel:
 			tempLBranchPositives = 0
 			tempLBranchNegatives = 0
@@ -240,13 +258,13 @@ for k in range(1, 31):
 				bestColumn = k
 				rightBranchLabel = rBranchLabel
 				leftBranchLabel = lBranchLabel
-				print "changed"
-				print "newStump: " + "%0.10f" % bestStump
-				print "newGreaterThan: ", bestGreaterThan
-				print "tempLBranchPositives: ", tempLBranchPositives
-				print "tempLBranchNegatives: ", tempLBranchNegatives
-				print "tempRBranchPositives: ", tempRBranchPositives
-				print "tempRBranchNegatives: ", tempRBranchNegatives
+				# print "changed"
+				# print "newStump: " + "%0.10f" % bestStump
+				# print "newGreaterThan: ", bestGreaterThan
+				# print "tempLBranchPositives: ", tempLBranchPositives
+				# print "tempLBranchNegatives: ", tempLBranchNegatives
+				# print "tempRBranchPositives: ", tempRBranchPositives
+				# print "tempRBranchNegatives: ", tempRBranchNegatives
 		# print hSList
 		# del hSList[:] # used to empty a list
 		del rBranch[:]
@@ -255,10 +273,12 @@ for k in range(1, 31):
 		del leftBranch[:]
 
 print "\n"
-print hSList
-print "%0.16f" % bestStump
-print bestGreaterThan
-print bestColumn
+# print hSList
+print "Decision Stump: " + "%0.16f" % bestStump
+print "Value used in greater than operator: ", bestGreaterThan
+print "Column/feature used: ", bestColumn # note that if column 1, would be first feature column
+print "Right Branch Label: ", rightBranchLabel
+print "Left Branch Label: ", leftBranchLabel
 # greaterThan = Y[1]
 # for i in range(0, np.size(Y)):
 # 	if Y[i] > greaterThan:

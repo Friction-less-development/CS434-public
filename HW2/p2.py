@@ -279,35 +279,3 @@ print "Value used in greater than operator: ", bestGreaterThan
 print "Column/feature used: ", bestColumn # note that if column 1, would be first feature column
 print "Right Branch Label: ", rightBranchLabel
 print "Left Branch Label: ", leftBranchLabel
-# greaterThan = Y[1]
-# for i in range(0, np.size(Y)):
-# 	if Y[i] > greaterThan:
-# 		positiveList.append(Y[i])
-# 	else:
-# 		negativesList.append(Y[i])
-
-# # formattedPositiveList = [ '%.2f' % elem for elem in positiveList]
-# # formattedNegativeList = [ '%.2f' % elem for elem in negativesList]
-# # print formattedPositiveList
-# # print "Number of positives: ", np.size(positiveList)
-# # print "\n", formattedNegativeList
-# # print "Number of negatives: ", np.size(negativesList)
-# # print "\n", greaterThan
-# if np.size(hSList) == 0:
-# 	posONegatives = np.size(positiveList)/float(np.size(negativesList)+np.size(positiveList)) # positives/negatives
-# 	negOPositives = np.size(negativesList)/float(np.size(positiveList)+np.size(negativesList)) # negatives/positives
-# 	temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-# 	posNumCount = np.size(positiveList)
-# 	negNumCount = np.size(negativesList)
-# 	hSList.append(temp)
-# elif np.size(positiveList) != posNumCount and np.size(negativesList) != negNumCount:
-# 	posONegatives = np.size(positiveList)/float(np.size(negativesList)+np.size(positiveList)) # positives/negatives
-# 	negOPositives = np.size(negativesList)/float(np.size(positiveList)+np.size(negativesList)) # negatives/positives
-# 	temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-# 	if temp < hSList[0]: # 0 would i, in some loop for each column/feature
-# 		hSList[0] = temp
-
-# print hSList
-# # del hSList[:] # used to empty a list
-# del negativesList[:]
-# del positiveList[:]

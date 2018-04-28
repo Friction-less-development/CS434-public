@@ -279,3 +279,41 @@ print "Value used in greater than operator: ", bestGreaterThan
 print "Column/feature used: ", bestColumn # note that if column 1, would be first feature column
 print "Right Branch Label: ", rightBranchLabel
 print "Left Branch Label: ", leftBranchLabel
+
+leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+rightBranchNumPositive = 0
+rightBranchNumNegative = 0
+leftBranchNumWNegative = 0
+leftBranchNumPositive = 0
+leftBranch = []
+rightBranch = []
+for i in range(0, np.size(Y)):
+	if X[i][bestColumn] > bestGreaterThan:
+		rightBranch.append(X[i][bestColumn])
+		if X[i][0] == 1:
+			rightBranchNumPositive += 1
+		else:
+			rightBranchNumNegative += 1
+	else:
+		leftBranch.append(X[i][bestColumn])
+		if X[i][0] == 1:
+			leftBranchNumPositive += 1
+		else:
+			leftBranchNumWNegative += 1
+
+if leftBranchNumWNegative > leftBranchNumPositive:
+	leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+else:
+	leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+if rightBranchNumNegative > rightBranchNumPositive:
+	rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+else:
+	rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+
+print "Left branch Training Error: ", leftBranchRatio
+print "Right branch Training Error: ", rightBranchRatio
+totalRatio = 0.0
+totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
+totalRatio = totalRatio * 100
+print "Decision Stump Training Error: ", totalRatio

@@ -26,8 +26,10 @@ import matplotlib.patches as mpatches
 # get matrix from knn_train
 np.set_printoptions(suppress=True)
 X = np.zeros(shape=(1,31)) # Matrix of data
+XT = np.zeros(shape=(1,31)) # Matrix of test
 
-print "Part 1"
+
+print "Problem 1 of Part 2"
 firstLine = True
 with open('knn_train.csv','r') as f:
     for line in f:
@@ -317,3 +319,76 @@ totalRatio = 0.0
 totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
 totalRatio = totalRatio * 100
 print "Decision Stump Training Error: ", totalRatio
+print "\n"
+# test data
+del leftBranch[:]
+del rightBranch[:]
+leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+rightBranchNumPositive = 0
+rightBranchNumNegative = 0
+leftBranchNumWNegative = 0
+leftBranchNumPositive = 0
+firstLine = True
+with open('knn_test.csv','r') as f:
+    for line in f:
+    	featureNum = 0
+    	lineWords = []
+    	averageValue = []
+        for word in line.split(','):
+           if featureNum >= 0:
+           	lineWords.append(float(word))
+           	featureNum += 1
+        if firstLine:
+        	XT[0] = lineWords
+        	firstLine = False
+        else:
+        	XT = np.vstack((XT, lineWords))
+
+#normalize data
+findMax = -1
+findMin = -1
+for i in range(1, 31):
+	for j in range(0, np.size(XT, 0)):
+		if findMax == -1:
+			findMax = XT[j][i]
+		elif findMax < XT[j][i]:
+			findMax = XT[j][i]
+		if findMin == -1:
+			findMin = XT[j][i]
+		elif findMin > XT[j][i]:
+			findMin = XT[j][i]
+
+for i in range(1, 31):
+	for j in range(0, np.size(XT, 0)):
+		XT[j][i] = (XT[j][i]-findMin)/float(findMax-findMin)
+
+for i in range(0, np.size(Y)):
+	if XT[i][bestColumn] > bestGreaterThan:
+		rightBranch.append(XT[i][bestColumn])
+		if XT[i][0] == 1:
+			rightBranchNumPositive += 1
+		else:
+			rightBranchNumNegative += 1
+	else:
+		leftBranch.append(XT[i][bestColumn])
+		if XT[i][0] == 1:
+			leftBranchNumPositive += 1
+		else:
+			leftBranchNumWNegative += 1
+
+if leftBranchNumWNegative > leftBranchNumPositive:
+	leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+else:
+	leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+if rightBranchNumNegative > rightBranchNumPositive:
+	rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+else:
+	rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+
+print "Left branch Test Error: ", leftBranchRatio
+print "Right branch Test Error: ", rightBranchRatio
+totalRatio = 0.0
+totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
+totalRatio = totalRatio * 100
+print "Decision Stump Test Error: ", totalRatio

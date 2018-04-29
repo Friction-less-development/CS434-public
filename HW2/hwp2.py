@@ -84,7 +84,7 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
         for i in range(0, np.size(XleftSplit)):
             if yTrain[XleftSplit[i]] == 1:
                 numLeftPositives += 1
-            elif yTrain[XleftSplit[i]] == 0:
+            elif yTrain[XleftSplit[i]] == -1:
                 numLeftNegatives += 1
             else:
                 print "Shouldn't get here left side"
@@ -104,7 +104,7 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
         for i in range(0, np.size(XrightSplit)):
             if yTrain[XrightSplit[i]] == 1:
                 numRightPositives += 1
-            elif yTrain[XrightSplit[i]] == 0:
+            elif yTrain[XrightSplit[i]] == -1:
                 numRightNegatives += 1
             else:
                 print "Shouldn't get here right side"

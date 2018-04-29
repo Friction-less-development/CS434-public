@@ -278,8 +278,8 @@ for k in range(1, 31):
 
 print "\n"
 # print hSList
-print "Decision Stump: " + "%0.16f" % bestStump
-print "Value used in greater than operator: ", bestGreaterThan
+print "Decision Stump: ", bestGreaterThan
+print "Computer Information Gain: " + "%0.16f" % bestStump
 print "Column/feature used: ", bestColumn # note that if column 1, would be first feature column
 print "Right Branch Label: ", rightBranchLabel
 print "Left Branch Label: ", leftBranchLabel

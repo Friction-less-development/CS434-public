@@ -7,7 +7,7 @@ def informationGain(xSplit, ySplit):
 	negPositiveRatio = 0.0
 	if (np.size(xSplit) > 0)
 		posNegativeRatio = xSplit.numPositives/(float(xSplit.numPositives + xSplit.numNegatives))
-		negPositiveRatio = xSplit.numPositives/(float(xSplit.numPositives + xSplit.numNegatives))
+		negPositiveRatio = xSplit.numNegatives/(float(xSplit.numPositives + xSplit.numNegatives))
 	if posNegativeRatio == 0 or negPositiveRatio == 0:
 		temp = 0
 	else:

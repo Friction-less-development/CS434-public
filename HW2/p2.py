@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as mpl
+import math as math
 
 mpl.use('Agg')
 
@@ -26,6 +27,7 @@ import matplotlib.patches as mpatches
 # get matrix from knn_train
 np.set_printoptions(suppress=True)
 X = np.zeros(shape=(1,31)) # Matrix of data
+XN = np.zeros(shape=(1,31)) # Matrix of data
 XT = np.zeros(shape=(1,31)) # Matrix of test
 
 
@@ -47,24 +49,26 @@ with open('knn_train.csv','r') as f:
         	X = np.vstack((X, lineWords))
 
 #normalize data
-findMax = -1
-findMin = -1
-for i in range(1, 31):
-	findMax = -1
-	findMin = -1
-	for j in range(0, np.size(X, 0)):
-		if findMax == -1:
-			findMax = X[j][i]
-		elif findMax < X[j][i]:
-			findMax = X[j][i]
-		if findMin == -1:
-			findMin = X[j][i]
-		elif findMin > X[j][i]:
-			findMin = X[j][i]
+X = (X - X.min(0)) / X.ptp(0)
+# findMax = -1
+# findMin = -1
+# for i in range(1, 31):
+# 	findMax = -1
+# 	findMin = -1
+# 	for j in range(0, np.size(XN, 0)):
+# 		if findMax == -1:
+# 			findMax = XN[j][i]
+# 		elif findMax < XN[j][i]:
+# 			findMax = XN[j][i]
+# 		if findMin == -1:
+# 			findMin = XN[j][i]
+# 		elif findMin > XN[j][i]:
+# 			findMin = XN[j][i]
 
-for i in range(1, 31):
-	for j in range(0, np.size(X, 0)):
-		X[j][i] = (X[j][i]-findMin)/float(findMax-findMin)
+# XN = np.zeros(shape=(1,31)) # Matrix of data
+# for i in range(1, 31):
+# 	for j in range(0, np.size(XN, 0)):
+# 		X[j][i] = (XN[j][i]-findMin)/float(findMax-findMin)
 
 #global
 bestStump = -1 # global, will be used to find the best overall decision stump
@@ -164,13 +168,16 @@ for k in range(1, 31):
 		if np.size(hSList) == 0:
 			tempLBranchPositives = 0
 			tempLBranchNegatives = 0
+			posONegatives = 0.0
+			negOPositives = 0.0
 			for i in range(0, np.size(lBranch)):
 				if lBranch[i] == 1:
 					tempLBranchPositives += 1
 				else:
 					tempLBranchNegatives += 1
-			posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
-			negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
+			if np.size(lBranch) != 0:
+				posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
+				negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
 			# print tempBranchPositives
 			# print tempBranchNegatives
 			temp = -1
@@ -181,13 +188,16 @@ for k in range(1, 31):
 			hSList.append(temp)
 			tempRBranchPositives = 0
 			tempRBranchNegatives = 0
+			posONegatives = 0.0
+			negOPositives = 0.0
 			for i in range(0, np.size(rBranch)):
 				if rBranch[i] == 1:
 					tempRBranchPositives += 1
 				else:
 					tempRBranchNegatives += 1
-			posONegatives = tempRBranchPositives/float(tempRBranchPositives+tempRBranchNegatives) # positives/total for this branch
-			negOPositives = tempRBranchNegatives/float(tempRBranchPositives+tempRBranchNegatives) # negatives/total for this branch
+			if np.size(rBranch) != 0:
+				posONegatives = tempRBranchPositives/float(tempRBranchPositives+tempRBranchNegatives) # positives/total for this branch
+				negOPositives = tempRBranchNegatives/float(tempRBranchPositives+tempRBranchNegatives) # negatives/total for this branch
 			temp = -1
 			if posONegatives == 0 or negOPositives == 0:
 				temp = 0
@@ -398,5 +408,9 @@ totalRatio = 0.0
 totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
 totalRatio = totalRatio * 100
 print "Decision Stump Test Error: ", totalRatio
-
+# print X
 print "Problem 2"
+decisionTrees = [] # the other decision trees/nodes
+leftBranches = []  # all left branches
+rightBranches = [] # all right branches
+bestGreaterThanList = [] # list of bestGreaterThan values

@@ -153,13 +153,7 @@ for k in range(1, 31):
 			lBranchLabel = 1
 		elif lBranchLabel < 0:
 			lBranchLabel = -1
-		# formattedPositiveList = [ '%.2f' % elem for elem in positiveList]
-		# formattedNegativeList = [ '%.2f' % elem for elem in negativesList]
-		# print formattedPositiveList
-		# print "Number of positives: ", np.size(positiveList)
-		# print "\n", formattedNegativeList
-		# print "Number of negatives: ", np.size(negativesList)
-		# print "\n", greaterThan
+
 		tempLabelBranch = -1
 		if np.size(positiveList) > np.size(negativesList):
 			tempLabelBranch = 1
@@ -178,8 +172,7 @@ for k in range(1, 31):
 			if np.size(lBranch) != 0:
 				posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
 				negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
-			# print tempBranchPositives
-			# print tempBranchNegatives
+
 			temp = -1
 			if posONegatives == 0 or negOPositives == 0:
 				temp = 0
@@ -206,11 +199,7 @@ for k in range(1, 31):
 			rightBranchLabel = rBranchLabel
 			leftBranchLabel = lBranchLabel
 			hSList.append(temp)
-			# greaterThanPrev = greaterThan
-			# print temp
-			# print greaterThanPrev
-			# print tempBranchPositives
-			# print tempBranchNegatives
+
 			tempNewHS = hS - (tempLBranchPositives + tempLBranchNegatives)/float(np.size(Y))*hSList[0]-(tempRBranchPositives + tempRBranchNegatives)/float(np.size(Y))*hSList[1]
 			if bestStump == -1:
 				bestStump = tempNewHS
@@ -230,20 +219,14 @@ for k in range(1, 31):
 					tempLBranchNegatives += 1
 			posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
 			negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
-			# print posONegatives
-			# print negOPositives
+
 			temp = -1
 			if posONegatives == 0 or negOPositives == 0:
 				temp = 0
 			else:
 				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-			# if temp < hSList[0]: # Will be i*2
+
 			hSList[0] = temp
-				# greaterThanPrev = greaterThan
-				# print "\n"
-				# print greaterThanPrev
-				# print tempBranchPositives
-				# print tempBranchNegatives
 			tempRBranchPositives = 0
 			tempRBranchNegatives = 0
 			for i in range(0, np.size(rBranch)):
@@ -258,13 +241,8 @@ for k in range(1, 31):
 				temp = 0
 			else:
 				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-			# if temp < hSList[1]: # will be i*2+1
+
 			hSList[1] = temp
-				# greaterThanPrev = greaterThan
-				# print "\n"
-				# print greaterThanPrev
-				# print tempBranchPositives
-				# print tempBranchNegatives
 			tempNewHS = hS - (tempLBranchPositives + tempLBranchNegatives)/float(np.size(Y))*hSList[0]-(tempRBranchPositives + tempRBranchNegatives)/float(np.size(Y))*hSList[1]
 			if tempNewHS < bestStump:
 				bestStump = tempNewHS
@@ -272,13 +250,7 @@ for k in range(1, 31):
 				bestColumn = k
 				rightBranchLabel = rBranchLabel
 				leftBranchLabel = lBranchLabel
-				# print "changed"
-				# print "newStump: " + "%0.10f" % bestStump
-				# print "newGreaterThan: ", bestGreaterThan
-				# print "tempLBranchPositives: ", tempLBranchPositives
-				# print "tempLBranchNegatives: ", tempLBranchNegatives
-				# print "tempRBranchPositives: ", tempRBranchPositives
-				# print "tempRBranchNegatives: ", tempRBranchNegatives
+
 		# print hSList
 		# del hSList[:] # used to empty a list
 		del rBranch[:]

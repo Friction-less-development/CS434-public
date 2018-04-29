@@ -46,32 +46,16 @@ class Tree(object):
     def __init__(self):
         self.xLeft = None
         self.xRight = None
-        self.yLeft = None
-        self.yRight = None        
+#         self.yLeft = None
+#         self.yRight = None        
         # index of the feature for this node
         self.feature = None        
         # threshold for the feature
         self.threshold = None
         self.informationGain = None
         self.entropy = None 
-
-# data is our dataset (X)
-# index is the index of the feature we're splitting on
-# threshold is the threshold value
-# returns XleftSplit, XrightSplit, yLeftSplit, yLeftSplit 
-def split(Xset, yset, index, threshold):
-    XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = list(), list(), list(), list()
-    i = 0
-    for row in Xset:
-        if row[index] <= threshold:
-            XleftSplit.append(i)
-            yLeftSplit.append(i)
-        if row[index] > threshold:
-            XrightSplit.append(i)
-            yLeftSplit.append(i)
-        i = i + 1
-    return XleftSplit, XrightSplit, yLeftSplit, yLeftSplit
-
+        
+        
 def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list or something, once it become "permeanent/chosen" branch/node
     hS = -1.0 # will calculate below
     hSList = []
@@ -119,33 +103,78 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
     hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
     return hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))
 
-
+# data is our dataset (X)
+# index is the index of the feature we're splitting on
+# threshold is the threshold value
+# returns XleftSplit, XrightSplit, yLeftSplit, yLeftSplit 
+def split(Xset, yset, index, threshold):
+    XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = list(), list(), list(), list()
+    i = 0
+    for row in Xset:
+        if row[index] <= threshold:
+            XleftSplit.append(i)
+            yLeftSplit.append(i)
+        if row[index] > threshold:
+            XrightSplit.append(i)
+            yLeftSplit.append(i)
+        i = i + 1
+    return XleftSplit, XrightSplit
 
 def findSplit(Xset, yset):
-    
-    #PSEUDO CODE
-    
-    xlength = length of Xset (num of samples)
-    ylength = length of yset (num of features)
-    
-    maxIgain = 0
-    
-    for j in range(ylength):
-        for i in range(xlength):
-            current = Xset[i]
-            threshold = current[j]
-            
-            XleftSplit, XrightSplit = split(X, y, feature_idx, threshold)
-            cost = infoGain(XleftSplit, XrightSplit)
-            if cost > maxIgain:
-                maxIgain = cost
-                bestSplit = XleftSplit, XrightSplit
-                featureIndex = j
-                finalThreshold = threshold
-    return . . .
 
     
-XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = split(XTrain, 10, .1)
-print(len(XleftSplit))
-print(len(XrightSplit))
+    numSamples, numFeatures = Xset.shape 
+    print(Xset.shape)
+    print("numfeatures: ", numFeatures)
+    
+    maxIgain = 0
+    bestXleftSplit = -1 
+    bestXrightSplit = -1
+    featureIndex = -1
+    finalThreshold = -1
+    
+    for feature in range(numFeatures):
+        for sample in range(numSamples):
+            current = Xset[sample]
+            threshold = current[feature]
+            XleftSplit, XrightSplit = split(Xset, yset, feature, threshold)
+            igain = infoGain(XleftSplit, XrightSplit)
+#             print("igain: ", igain)
+#             print("feature: ", feature)
+#             print("sample: ", sample)
+            if igain > maxIgain:
+                maxIgain = igain
+                bestXleftSplit = XleftSplit 
+                bestXrightSplit = XrightSplit
+                featureIndex = feature
+                finalThreshold = threshold
+    
+    node = Tree()
+
+    node.xLeft = bestXleftSplit
+    node.xRight = bestXRightSplit
+    node.feature = featureIndex
+    node.informationGain = maxIgain
+    node.threshold = finalThreshold
+    
+    
+    return node
+
+def createTree():
+    
+    return test
+
+
+    
+rootNode = Tree()
+rootNode = findSplit(XTrain, yTrain)
+
+print(rootNode.feature)
+print(rootNode.threshold)
+print(rootNode.informationGain)
+    
+# XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = split(XTrain, 10, .1)
+# print(len(XleftSplit))
+# print(len(XrightSplit))
             
+    

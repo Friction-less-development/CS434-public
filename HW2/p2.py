@@ -50,6 +50,8 @@ with open('knn_train.csv','r') as f:
 findMax = -1
 findMin = -1
 for i in range(1, 31):
+	findMax = -1
+	findMin = -1
 	for j in range(0, np.size(X, 0)):
 		if findMax == -1:
 			findMax = X[j][i]
@@ -377,11 +379,15 @@ for i in range(0, np.size(Y)):
 		else:
 			leftBranchNumWNegative += 1
 
-if leftBranchNumWNegative > leftBranchNumPositive:
+if np.size(leftBranch) == 0:
+	leftBranchRatio = 0.0
+elif leftBranchNumWNegative > leftBranchNumPositive:
 	leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
 else:
 	leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
-if rightBranchNumNegative > rightBranchNumPositive:
+if np.size(rightBranch) == 0:
+	rightBranchRatio = 0.0
+elif rightBranchNumNegative > rightBranchNumPositive:
 	rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
 else:
 	rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
@@ -392,3 +398,5 @@ totalRatio = 0.0
 totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
 totalRatio = totalRatio * 100
 print "Decision Stump Test Error: ", totalRatio
+
+print "Problem 2"

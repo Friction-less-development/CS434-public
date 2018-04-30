@@ -1,3 +1,10 @@
+#Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
+
+#HOW TO RUN: python2.7 p2.py
+#Folder must contain usps-4-9-train.csv and usps-4-9-test.csv data files
+
+#This program was modelled off of Jason Brownlee's tutorial found at https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
+
 import numpy as np
 import matplotlib as mpl
 import math as math
@@ -6,383 +13,441 @@ mpl.use('Agg')
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-#Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
-#Sources: https://matplotlib.org/users/pyplot_tutorial.html
-#	https://stackoverflow.com/questions/13336823/matplotlib-python-error
-#	https://matplotlib.org/tutorials/intermediate/legend_guide.html#sphx-glr-tutorials-intermediate-legend-guide-py
-#	https://matplotlib.org/users/pyplot_tutorial.html
-#	https://stackoverflow.com/questions/2828059/sorting-arrays-in-numpy-by-column
-#	https://docs.scipy.org/doc/numpy/reference/generated/numpy.ma.size.html
-#	https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.log2.html
-#	https://stackoverflow.com/questions/5326112/how-to-round-each-item-in-a-list-of-floats-to-2-decimal-places
 
-#HOW TO RUN: python p2.py
 
-#Question 2 Decision Tree
-#Part 1 Decision Stump
 
-# avgTrainList = [] # hold the values of avg ASE for training
-# avgTestList = [] # hold the values of avg ASE for test
+X = np.zeros(shape=(1,31)) # Matrix of data
+y = np.zeros(shape=(284,1)) # Matrix of data
 
 # get matrix from knn_train
-np.set_printoptions(suppress=True)
-X = np.zeros(shape=(1,31)) # Matrix of data
-XN = np.zeros(shape=(1,31)) # Matrix of data
-XT = np.zeros(shape=(1,31)) # Matrix of test
-
-
-print "Problem 1 of Part 2"
 firstLine = True
 with open('knn_train.csv','r') as f:
     for line in f:
-    	featureNum = 0
-    	lineWords = []
-    	averageValue = []
+        featureNum = 0
+        lineWords = []
+        averageValue = []
         for word in line.split(','):
            if featureNum >= 0:
-           	lineWords.append(float(word))
-           	featureNum += 1
+               lineWords.append(float(word))
+               featureNum += 1
         if firstLine:
-        	X[0] = lineWords
-        	firstLine = False
+            X[0] = lineWords
+            firstLine = False
         else:
-        	X = np.vstack((X, lineWords))
+            X = np.vstack((X, lineWords))
 
-#normalize data
-X = (X - X.min(0)) / X.ptp(0)
-# findMax = -1
-# findMin = -1
-# for i in range(1, 31):
-# 	findMax = -1
-# 	findMin = -1
-# 	for j in range(0, np.size(XN, 0)):
-# 		if findMax == -1:
-# 			findMax = XN[j][i]
-# 		elif findMax < XN[j][i]:
-# 			findMax = XN[j][i]
-# 		if findMin == -1:
-# 			findMin = XN[j][i]
-# 		elif findMin > XN[j][i]:
-# 			findMin = XN[j][i]
+# make a new vector of y values
+yTrain = X[:,0]
 
-# XN = np.zeros(shape=(1,31)) # Matrix of data
-# for i in range(1, 31):
-# 	for j in range(0, np.size(XN, 0)):
-# 		X[j][i] = (XN[j][i]-findMin)/float(findMax-findMin)
+#cut out the y values
+XTrain = np.delete(X, 0, 1)        
+            
+#normalize data between 0 and 1
+XTrain = (XTrain - XTrain.min(0)) / XTrain.ptp(0)
 
-#global
-bestStump = -1 # global, will be used to find the best overall decision stump
-hS = 0.0 # H(S) value, will be the same for no matter which column it is, because the number of positives/negatives overall will not change
-hSList = [] # list of h(s1), h(s2)... will be used later
+# tree class.
+class Tree(object):
+    def __init__(self):
+        self.xLeft = None
+        self.xRight = None       
+        # index of the feature for this node
+        self.feature = None        
+        # threshold for the feature
+        self.threshold = None
+        self.informationGain = None
+        self.entropy = None
+        self.rightChild = None
+        self.leftChild = None
+        self.classification = None
+        
+        
+def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list or something, once it become "permeanent/chosen" branch/node
+    hS = -1.0 # will calculate below
+    hSList = []
+    temp = -1
+    posNegativeRatio = 0
+    negPositiveRatio = 0
+    numLeftPositives = 0
+    numLeftNegatives = 0
+    if np.size(XleftSplit) > 0:
+        for i in range(0, np.size(XleftSplit)):
+            if yTrain[XleftSplit[i]] == 1:
+                numLeftPositives += 1
+            elif yTrain[XleftSplit[i]] == -1:
+                numLeftNegatives += 1
+            else:
+                print "Shouldn't get here left side"
+        if np.size(XleftSplit) > 0:
+            posNegativeRatio = numLeftPositives/(float(numLeftPositives + numLeftNegatives))
+            negPositiveRatio = numLeftNegatives/(float(numLeftPositives + numLeftNegatives))
+    if posNegativeRatio == 0 or negPositiveRatio == 0:
+        temp = 0
+    else:
+        temp = -posNegativeRatio*np.log2(posNegativeRatio)-negPositiveRatio*np.log2(negPositiveRatio)
+    hSList.append(temp)
+    temp = -1
+    numRightPositives = 0
+    numRightNegatives = 0
+    if np.size(XrightSplit) > 0:
+        
+        for i in range(0, np.size(XrightSplit)):
+            if yTrain[XrightSplit[i]] == 1:
+                numRightPositives += 1
+            elif yTrain[XrightSplit[i]] == -1:
+                numRightNegatives += 1
+            else:
+                print "Shouldn't get here right side"
+        if np.size(XrightSplit) > 0:
+            posNegativeRatio = numRightPositives/(float(numRightPositives + numRightNegatives))
+            negPositiveRatio = numRightNegatives/(float(numRightPositives + numRightNegatives))
+    if posNegativeRatio == 0 or negPositiveRatio == 0:
+        temp = 0
+    else:
+        temp = -posNegativeRatio*np.log2(posNegativeRatio)-negPositiveRatio*np.log2(negPositiveRatio)
+    hSList.append(temp)
 
-# note that this is a per column basis
-bestGreaterThan = 0.0
-bestColumn = -1
-greaterThan = 0.0 # will be used to where the cutoff is, it will go anything greater than will become "+" while evertyhing less than or equal to will become "-", as shown in slide 19
-positiveList = [] # overall column positive list
-negativesList = [] # overall column negative list
-lBranch = [] # used to store if something is negative/positive in left branch
-rBranch = [] # used to store if something is negative/positive in right branch0
+    if (numLeftPositives == 0 and numRightPositives == 0):
+    	hS = -(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+    elif (numLeftNegatives == 0 and numRightNegatives == 0):
+    	hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+    else:
+    	hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
 
-rightBranch = [] # will be used to hold everything greater than greaterThan value
-leftBranch = []  # will be used to hold everything less than or equal to greaterThan value
-# print X
-# print Y
-# print "\n"
-XSortTest = X[X[:,1].argsort()]
-Y = XSortTest[:, 1] # getting a single column, which might be useful for doing calculations on
-# print XSortTest
-# print "\n"
-# print Y
 
-for i in range(0, np.size(Y)):
-	if X[i][0] == 1:
-		positiveList.append(float(Y[i]))
-	else:
-		negativesList.append(float(Y[i]))
+    return (hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[0]-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[1])
 
-print "Total number of positives: ", np.size(positiveList)
-print "Total number of negatives: ", np.size(negativesList)
-tPosONegatives = np.size(positiveList)/float(np.size(negativesList)+np.size(positiveList)) # positives/negatives
-tNegOPositives = np.size(negativesList)/float(np.size(positiveList)+np.size(negativesList)) # negatives/positives
-hS = -tPosONegatives*np.log2(tPosONegatives)-tNegOPositives*np.log2(tNegOPositives)
-print "H(S): ", hS
-#column d = 1, aka decision stump
-for k in range(1, 31):
-	rightBranchLabel = 0
-	leftBranchLabel = 0
-	del hSList[:]
-	XSortTest = X[X[:,k].argsort()]
-	Y = XSortTest[:, k] # getting a single column, which might be useful for doing calculations on
-	for j in range(0, np.size(Y)-1):
-		greaterThan = Y[j]
-		for i in range(0, np.size(Y)):
-			if Y[i] > greaterThan:
-				rightBranch.append(Y[i])
-				if X[i][0] == 1:
-					rBranch.append(1)
-				else:
-					rBranch.append(-1)
-			else:
-				leftBranch.append(Y[i])
-				if X[i][0] == 1:
-					lBranch.append(1)
-				else:
-					lBranch.append(-1)
-			# if X[i][0] == 1:
-			# 	positiveList.append(float(Y[i]))
-			# else:
-			# 	negativesList.append(float(Y[i]))
-		rBranchLabel = 0 # start as neutral
-		lBranchLabel = 0 # start as neutral
-		for i in range(0, np.size(rBranch)):
-			if rBranch[i] == 1:
-				rBranchLabel += 1
-			else:
-				rBranchLabel -= 1
-		for i in range(0, np.size(lBranch)):
-			if lBranch[i] == 1:
-				lBranchLabel += 1
-			else:
-				lBranchLabel -= 1
-		if rBranchLabel > 0:
-			rBranchLabel = 1
-		elif rBranchLabel < 0:
-			rBranchLabel = -1
-		if lBranchLabel > 0:
-			lBranchLabel = 1
-		elif lBranchLabel < 0:
-			lBranchLabel = -1
+# split a given set based of the provided threshold and feature
+# Xset is our dataset
+# index is the index of the feature we're splitting on
+# threshold is the threshold value
+# returns XleftSplit, XrightSplit
+def split(Xset, index, threshold):
+    XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = list(), list(), list(), list()
+    i = 0
+    for row in Xset:
+        if row[index] <= threshold:
+            XleftSplit.append(i)
+            yLeftSplit.append(i)
+        if row[index] > threshold:
+            XrightSplit.append(i)
+            yLeftSplit.append(i)
+        i = i + 1
+    return XleftSplit, XrightSplit
 
-		tempLabelBranch = -1
-		if np.size(positiveList) > np.size(negativesList):
-			tempLabelBranch = 1
-		else:
-			tempLabelBranch = 0
-		if np.size(hSList) == 0:
-			tempLBranchPositives = 0
-			tempLBranchNegatives = 0
-			posONegatives = 0.0
-			negOPositives = 0.0
-			for i in range(0, np.size(lBranch)):
-				if lBranch[i] == 1:
-					tempLBranchPositives += 1
-				else:
-					tempLBranchNegatives += 1
-			if np.size(lBranch) != 0:
-				posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
-				negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
+# find the optimum split 
+def findSplit(Xset):    
+    numSamples, numFeatures = XTrain.shape 
+    numSamples = len(Xset)
+    
+    Xset = XTrain[Xset]
+    
+    maxIgain = 0.0
+    featureIndex = -1
+    finalThreshold = -1
+    bestXleftSplit = []
+    bestXrightSplit = []
+    for feature in range(numFeatures):
+        for sample in range(numSamples):
+            current = Xset[sample]
+            threshold = current[feature]
+            XleftSplit, XrightSplit = split(Xset, feature, threshold)
+            igain = infoGain(XleftSplit, XrightSplit)
+            if igain > maxIgain:
+                maxIgain = igain
+                bestXleftSplit = XleftSplit 
+                bestXrightSplit = XrightSplit
+                featureIndex = feature
+                finalThreshold = threshold
+    
+    node = Tree()
+    
+    node.xLeft = bestXleftSplit
+    node.xRight = bestXrightSplit   
+    node.feature = featureIndex
+    node.informationGain = maxIgain
+    node.threshold = finalThreshold
+    
+    
+    return node
 
-			temp = -1
-			if posONegatives == 0 or negOPositives == 0:
-				temp = 0
-			else:
-				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-			hSList.append(temp)
-			tempRBranchPositives = 0
-			tempRBranchNegatives = 0
-			posONegatives = 0.0
-			negOPositives = 0.0
-			for i in range(0, np.size(rBranch)):
-				if rBranch[i] == 1:
-					tempRBranchPositives += 1
-				else:
-					tempRBranchNegatives += 1
-			if np.size(rBranch) != 0:
-				posONegatives = tempRBranchPositives/float(tempRBranchPositives+tempRBranchNegatives) # positives/total for this branch
-				negOPositives = tempRBranchNegatives/float(tempRBranchPositives+tempRBranchNegatives) # negatives/total for this branch
-			temp = -1
-			if posONegatives == 0 or negOPositives == 0:
-				temp = 0
-			else:
-				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-			rightBranchLabel = rBranchLabel
-			leftBranchLabel = lBranchLabel
-			hSList.append(temp)
+# recursively create the decision tree
+def createTree(currentDepth, maxDepth, currentNode):
+    xLeft = currentNode.xLeft
+    xRight = currentNode.xRight
+    
+    # class values
+    yLeft = yTrain[xLeft]
+    yRight = yTrain[xRight]
+    
+    # left and right child subtrees
+    leftChildNode = Tree()
+    rightChildNode = Tree()
+    
+    currentNode.leftChild = leftChildNode
+    currentNode.rightChild = rightChildNode 
 
-			tempNewHS = hS - (tempLBranchPositives + tempLBranchNegatives)/float(np.size(Y))*hSList[0]-(tempRBranchPositives + tempRBranchNegatives)/float(np.size(Y))*hSList[1]
-			if bestStump == -1:
-				bestStump = tempNewHS
-				bestGreaterThan = greaterThan
-				bestColumn = k
-			elif tempNewHS < bestStump:
-				bestStump = tempNewHS
-				bestGreaterThan = greaterThan
-				bestColumn = k
-		elif rBranchLabel != rightBranchLabel or lBranchLabel != leftBranchLabel:
-			tempLBranchPositives = 0
-			tempLBranchNegatives = 0
-			for i in range(0, np.size(lBranch)):
-				if lBranch[i] == 1:
-					tempLBranchPositives += 1
-				else:
-					tempLBranchNegatives += 1
-			posONegatives = tempLBranchPositives/float(tempLBranchPositives+tempLBranchNegatives) # positives/total for this branch
-			negOPositives = tempLBranchNegatives/float(tempLBranchPositives+tempLBranchNegatives) # negatives/total for this branch
-
-			temp = -1
-			if posONegatives == 0 or negOPositives == 0:
-				temp = 0
-			else:
-				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-
-			hSList[0] = temp
-			tempRBranchPositives = 0
-			tempRBranchNegatives = 0
-			for i in range(0, np.size(rBranch)):
-				if rBranch[i] == 1:
-					tempRBranchPositives += 1
-				else:
-					tempRBranchNegatives += 1
-			posONegatives = tempRBranchPositives/float(tempRBranchPositives+tempRBranchNegatives) # positives/total for this branch
-			negOPositives = tempRBranchNegatives/float(tempRBranchPositives+tempRBranchNegatives) # negatives/total for this branch
-			temp = -1
-			if posONegatives == 0 or negOPositives == 0:
-				temp = 0
-			else:
-				temp = -posONegatives*np.log2(posONegatives)-negOPositives*np.log2(negOPositives)
-
-			hSList[1] = temp
-			tempNewHS = hS - (tempLBranchPositives + tempLBranchNegatives)/float(np.size(Y))*hSList[0]-(tempRBranchPositives + tempRBranchNegatives)/float(np.size(Y))*hSList[1]
-			if tempNewHS < bestStump:
-				bestStump = tempNewHS
-				bestGreaterThan = greaterThan
-				bestColumn = k
-				rightBranchLabel = rBranchLabel
-				leftBranchLabel = lBranchLabel
-
-		# print hSList
-		# del hSList[:] # used to empty a list
-		del rBranch[:]
-		del lBranch[:]
-		del rightBranch[:]
-		del leftBranch[:]
-
-print "\n"
-# print hSList
-print "Decision Stump: ", bestGreaterThan
-print "Computer Information Gain: " + "%0.16f" % bestStump
-print "Column/feature used: ", bestColumn # note that if column 1, would be first feature column
-print "Right Branch Label: ", rightBranchLabel
-print "Left Branch Label: ", leftBranchLabel
-
-leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
-rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
-rightBranchNumPositive = 0
-rightBranchNumNegative = 0
-leftBranchNumWNegative = 0
-leftBranchNumPositive = 0
-leftBranch = []
-rightBranch = []
-for i in range(0, np.size(Y)):
-	if X[i][bestColumn] > bestGreaterThan:
-		rightBranch.append(X[i][bestColumn])
-		if X[i][0] == 1:
-			rightBranchNumPositive += 1
-		else:
-			rightBranchNumNegative += 1
-	else:
-		leftBranch.append(X[i][bestColumn])
-		if X[i][0] == 1:
-			leftBranchNumPositive += 1
-		else:
-			leftBranchNumWNegative += 1
-
-if leftBranchNumWNegative > leftBranchNumPositive:
-	leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
-else:
-	leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
-if rightBranchNumNegative > rightBranchNumPositive:
-	rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
-else:
-	rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
-
-print "Left branch Training Error: ", leftBranchRatio
-print "Right branch Training Error: ", rightBranchRatio
-totalRatio = 0.0
-totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
-totalRatio = totalRatio * 100
-print "Decision Stump Training Error: ", totalRatio
-print "\n"
-# test data
-del leftBranch[:]
-del rightBranch[:]
-leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
-rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
-rightBranchNumPositive = 0
-rightBranchNumNegative = 0
-leftBranchNumWNegative = 0
-leftBranchNumPositive = 0
-firstLine = True
-with open('knn_test.csv','r') as f:
-    for line in f:
-    	featureNum = 0
-    	lineWords = []
-    	averageValue = []
-        for word in line.split(','):
-           if featureNum >= 0:
-           	lineWords.append(float(word))
-           	featureNum += 1
-        if firstLine:
-        	XT[0] = lineWords
-        	firstLine = False
+    
+    # if there are 0 samples in one of our splits then its a leaf node and we set the classification
+    if len(xLeft) == 0 or len(xRight) == 0:
+        yBoth = np.append(yLeft, yRight)        
+        
+        # most common classification
+        numNegativeOnes = (yBoth == -1).sum()
+        numOnes = (yBoth == 1).sum()
+        if(numNegativeOnes >= numOnes):
+            currentNode.leftChild.classification = -1
+            currentNode.rightChild.classification = -1
         else:
-        	XT = np.vstack((XT, lineWords))
+            currentNode.leftChild.classification = 1
+            currentNode.rightChild.classification = 1
+        
+        return None
+    
+    
+    # if we've reached our max depth create left and right leaf nodes
+    if currentDepth >= maxDepth:
+        # set classification to most frequent
+        numNegativeOnes = (yLeft == -1).sum()
+        numOnes = (yLeft == 1).sum()
+        
+        if(numNegativeOnes >= numOnes):
+            currentNode.leftChild.classification = -1
+        else:
+            currentNode.leftChild.classification = 1
+        
+        numNegativeOnes = (yRight == -1).sum()
+        numOnes = (yRight == 1).sum()
+        
+        if(numNegativeOnes >= numOnes):
+            currentNode.rightChild.classification = -1
+        else:
+            currentNode.rightChild.classification = 1
 
-#normalize data
-findMax = -1
-findMin = -1
-for i in range(1, 31):
-	for j in range(0, np.size(XT, 0)):
-		if findMax == -1:
-			findMax = XT[j][i]
-		elif findMax < XT[j][i]:
-			findMax = XT[j][i]
-		if findMin == -1:
-			findMin = XT[j][i]
-		elif findMin > XT[j][i]:
-			findMin = XT[j][i]
+        return None
+    
+    
+    # if only a single sample left don't split node
+    if len(xLeft) <= 1:
+        # set classification to most frequent
+        numNegativeOnes = (yLeft == -1).sum()
+        numOnes = (yLeft == 1).sum()
+        
+        if(numNegativeOnes >= numOnes):
+            currentNode.leftChild.classification = -1
+        else:
+            currentNode.leftChild.classification = 1        
+        
+    # else find split and recursively call createTree
+    else:
+        currentNode.leftChild = findSplit(xLeft)
+        createTree(1+currentDepth, maxDepth, currentNode.leftChild)
+    
+    
+    
+    # if only a single sample left don't split node
+    if len(xRight) <= 1:
+        numNegativeOnes = (yRight == -1).sum()
+        numOnes = (yRight == 1).sum()
+        
+        if(numNegativeOnes >= numOnes):
+            currentNode.rightChild.classification = -1
+        else:
+            currentNode.rightChild.classification = 1
+        
+    # else find split and recursively call createTree
+    else:
+        currentNode.rightChild = findSplit(xRight)
+        createTree(1+currentDepth, maxDepth, currentNode.rightChild)
 
-for i in range(1, 31):
-	for j in range(0, np.size(XT, 0)):
-		XT[j][i] = (XT[j][i]-findMin)/float(findMax-findMin)
+    return currentNode
 
-for i in range(0, np.size(Y)):
-	if XT[i][bestColumn] > bestGreaterThan:
-		rightBranch.append(XT[i][bestColumn])
-		if XT[i][0] == 1:
-			rightBranchNumPositive += 1
-		else:
-			rightBranchNumNegative += 1
+def calcAccuracyTrain(treeNode): # need threshold and feature for node
+    firstLine = True
+    XT = np.zeros(shape=(1,31)) # Matrix of data
+    with open('knn_train.csv','r') as f:
+        for line in f:
+            featureNum = 0
+            lineWords = []
+            averageValue = []
+            for word in line.split(','):
+               if featureNum >= 0:
+                   lineWords.append(float(word))
+                   featureNum += 1
+            if firstLine:
+                XT[0] = lineWords
+                firstLine = False
+            else:
+                XT = np.vstack((XT, lineWords))
+    leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+    rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+    rightBranch = []
+    leftBranch = []
+    rightBranchNumPositive = 0
+    rightBranchNumNegative = 0
+    leftBranchNumWNegative = 0
+    leftBranchNumPositive = 0
+    for i in range(0, np.size(XT, 0)):
+        if XT[i][treeNode.feature] > treeNode.threshold:
+            rightBranch.append(XT[i][treeNode.feature])
+            if XT[i][0] == 1:
+                rightBranchNumPositive += 1
+            else:
+                rightBranchNumNegative += 1
+        else:
+            leftBranch.append(XT[i][treeNode.feature])
+            if XT[i][0] == 1:
+                leftBranchNumPositive += 1
+            else:
+                leftBranchNumWNegative += 1
+    if np.size(leftBranch) == 0:
+        leftBranchRatio = 0
+    elif leftBranchNumWNegative > leftBranchNumPositive:
+        leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+    else:
+        leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+    if np.size(rightBranch) == 0:
+        rightBranchRatio = 0
+    elif rightBranchNumNegative > rightBranchNumPositive:
+        rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+    else:
+        rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+    totalRatio = 0.0
+    totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(XT, 0)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(XT, 0)))
+    totalRatio = totalRatio * 100
+    return totalRatio
+
+def numNodes(treeNode, totalNodes):
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalNodes += 1
+		totalNodes = numNodes(treeNode.leftChild, totalNodes)
+		totalNodes = numNodes(treeNode.rightChild, totalNodes)
+		return totalNodes
 	else:
-		leftBranch.append(XT[i][bestColumn])
-		if XT[i][0] == 1:
-			leftBranchNumPositive += 1
-		else:
-			leftBranchNumWNegative += 1
+		return totalNodes
 
-if np.size(leftBranch) == 0:
-	leftBranchRatio = 0.0
-elif leftBranchNumWNegative > leftBranchNumPositive:
-	leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
-else:
-	leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
-if np.size(rightBranch) == 0:
-	rightBranchRatio = 0.0
-elif rightBranchNumNegative > rightBranchNumPositive:
-	rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
-else:
-	rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+def totalTreeCalcTrain(treeNode): # start with root node
+	totalSumRatio = 0.0
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalSumRatio += calcAccuracyTrain(treeNode)
+		totalSumRatio += totalTreeCalcTrain(treeNode.leftChild)
+		totalSumRatio += totalTreeCalcTrain(treeNode.rightChild)
+	return totalSumRatio
 
-print "Left branch Test Error: ", leftBranchRatio
-print "Right branch Test Error: ", rightBranchRatio
-totalRatio = 0.0
-totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(Y)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(Y)))
-totalRatio = totalRatio * 100
-print "Decision Stump Test Error: ", totalRatio
-# print X
-print "Problem 2"
-decisionTrees = [] # the other decision trees/nodes
-leftBranches = []  # all left branches
-rightBranches = [] # all right branches
-bestGreaterThanList = [] # list of bestGreaterThan values
+
+def calcAccuracyTest(treeNode): # need threshold and feature for node
+    firstLine = True
+    XT = np.zeros(shape=(1,31)) # Matrix of data
+    with open('knn_test.csv','r') as f:
+        for line in f:
+            featureNum = 0
+            lineWords = []
+            averageValue = []
+            for word in line.split(','):
+               if featureNum >= 0:
+                   lineWords.append(float(word))
+                   featureNum += 1
+            if firstLine:
+                XT[0] = lineWords
+                firstLine = False
+            else:
+                XT = np.vstack((XT, lineWords))
+    leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+    rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+    rightBranch = []
+    leftBranch = []
+    rightBranchNumPositive = 0
+    rightBranchNumNegative = 0
+    leftBranchNumWNegative = 0
+    leftBranchNumPositive = 0
+    for i in range(0, np.size(XT, 0)):
+        if XT[i][treeNode.feature] > treeNode.threshold:
+            rightBranch.append(XT[i][treeNode.feature])
+            if XT[i][0] == 1:
+                rightBranchNumPositive += 1
+            else:
+                rightBranchNumNegative += 1
+        else:
+            leftBranch.append(XT[i][treeNode.feature])
+            if XT[i][0] == 1:
+                leftBranchNumPositive += 1
+            else:
+                leftBranchNumWNegative += 1
+    if np.size(leftBranch) == 0:
+        leftBranchRatio = 0
+    elif leftBranchNumWNegative > leftBranchNumPositive:
+        leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+    else:
+        leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+    if np.size(rightBranch) == 0:
+        rightBranchRatio = 0
+    elif rightBranchNumNegative > rightBranchNumPositive:
+        rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+    else:
+        rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+    totalRatio = 0.0
+    totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(XT, 0)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(XT, 0)))
+    totalRatio = totalRatio * 100
+    return totalRatio
+
+def totalTreeCalcTest(treeNode): # start with root node
+	totalSumRatio = 0.0
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalSumRatio += calcAccuracyTest(treeNode)
+		totalSumRatio += totalTreeCalcTest(treeNode.leftChild)
+		totalSumRatio += totalTreeCalcTest(treeNode.rightChild)
+	return totalSumRatio
+
+    
+rootNode = Tree()
+
+xNumberOfSamples, xNumberOfFeatures = XTrain.shape
+# to find root call findSplit with a list that contains the indices of every sample in the training set
+xStartingSet = range(xNumberOfSamples)
+
+rootNode = findSplit(xStartingSet)
+
+
+print("Root node information: ")
+print "\n"
+print(rootNode.feature)
+print(rootNode.threshold)
+print(rootNode.informationGain)
+
+print "d = 1"
+print "Training: "
+print calcAccuracyTrain(rootNode)
+print "Test: "
+print calcAccuracyTest(rootNode)
+print "\n"
+
+totalTrainList = []
+totalTestList = []
+totalTrainList.append(calcAccuracyTrain(rootNode))
+totalTestList.append(calcAccuracyTest(rootNode))
+
+for i in range(2, 7):
+	decisionTree = Tree()
+	decisionTree = createTree(1, i, rootNode)
+	print "d = ", i
+	# print numNodes(decisionTree, 0)
+	print "Training: "
+	totalTrainList.append(totalTreeCalcTrain(decisionTree)/(float(numNodes(decisionTree, 0))))
+	totalTestList.append(totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0))))
+	print totalTreeCalcTrain(decisionTree)/(float(numNodes(decisionTree, 0)))
+	print "Test: "
+	print totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0)))
+
+	print "\n"
+
+plt.figure(1)
+plt.ylabel('Error Rates')
+plt.xlabel('D Features')
+xAxis = [1, 2, 3, 4, 5, 6]
+plt.title('Number of Features VS Error Rate')
+plt.plot(xAxis, totalTrainList, 'ro', label='Training Data')
+plt.plot(xAxis, totalTestList, 'bo', label='Test Data')
+
+plt.axis([0,8, 50, 85])
+
+plt.legend()
+plt.savefig('p2p2.png')

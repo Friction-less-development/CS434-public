@@ -1,3 +1,10 @@
+#Authors: Rex Henzie, Benjamin Richards, and Michael Giovannoni
+
+#HOW TO RUN: python2.7 p2.py
+#Folder must contain usps-4-9-train.csv and usps-4-9-test.csv data files
+
+#This program was modelled off of Jason Brownlee's tutorial found at https://machinelearningmastery.com/implement-decision-tree-algorithm-scratch-python/
+
 import numpy as np
 import matplotlib as mpl
 import math as math
@@ -38,16 +45,11 @@ XTrain = np.delete(X, 0, 1)
 #normalize data between 0 and 1
 XTrain = (XTrain - XTrain.min(0)) / XTrain.ptp(0)
 
-# print("x shape: " , XTrain.shape)
-# print("y shape: " , yTrain.shape)
-
 # tree class.
 class Tree(object):
     def __init__(self):
         self.xLeft = None
-        self.xRight = None
-#         self.yLeft = None
-#         self.yRight = None        
+        self.xRight = None       
         # index of the feature for this node
         self.feature = None        
         # threshold for the feature
@@ -103,10 +105,7 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
     else:
         temp = -posNegativeRatio*np.log2(posNegativeRatio)-negPositiveRatio*np.log2(negPositiveRatio)
     hSList.append(temp)
-    # print numLeftPositives
-    # print numRightPositives
-    # print numLeftNegatives
-    # print numRightNegatives
+
     if (numLeftPositives == 0 and numRightPositives == 0):
     	hS = -(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
     elif (numLeftNegatives == 0 and numRightNegatives == 0):
@@ -114,18 +113,14 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
     else:
     	hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
 
-  #   if hS == 0 or hS != hS:
-		# print numLeftPositives
-		# print numRightPositives
-		# print numLeftNegatives
-		# print numRightNegatives
-		# print "\n"
+
     return (hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[0]-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[1])
 
-# data is our dataset (X)
+# split a given set based of the provided threshold and feature
+# Xset is our dataset
 # index is the index of the feature we're splitting on
 # threshold is the threshold value
-# returns XleftSplit, XrightSplit, yLeftSplit, yLeftSplit 
+# returns XleftSplit, XrightSplit
 def split(Xset, index, threshold):
     XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = list(), list(), list(), list()
     i = 0
@@ -139,6 +134,7 @@ def split(Xset, index, threshold):
         i = i + 1
     return XleftSplit, XrightSplit
 
+# find the optimum split 
 def findSplit(Xset):    
     numSamples, numFeatures = XTrain.shape 
     numSamples = len(Xset)
@@ -156,9 +152,6 @@ def findSplit(Xset):
             threshold = current[feature]
             XleftSplit, XrightSplit = split(Xset, feature, threshold)
             igain = infoGain(XleftSplit, XrightSplit)
-#             print("igain: ", igain)
-#             print("feature: ", feature)
-#             print("sample: ", sample)
             if igain > maxIgain:
                 maxIgain = igain
                 bestXleftSplit = XleftSplit 
@@ -177,6 +170,7 @@ def findSplit(Xset):
     
     return node
 
+# recursively create the decision tree
 def createTree(currentDepth, maxDepth, currentNode):
     xLeft = currentNode.xLeft
     xRight = currentNode.xRight
@@ -413,7 +407,8 @@ xStartingSet = range(xNumberOfSamples)
 rootNode = findSplit(xStartingSet)
 
 
-
+print("Root node information: ")
+print "\n"
 print(rootNode.feature)
 print(rootNode.threshold)
 print(rootNode.informationGain)
@@ -429,10 +424,7 @@ totalTrainList = []
 totalTestList = []
 totalTrainList.append(calcAccuracyTrain(rootNode))
 totalTestList.append(calcAccuracyTest(rootNode))
-# num_negativeOnes = (yTrain == -1).sum()
-# num_ones = (yTrain == 1).sum()
 
-# print(num_negativeOnes, " ", num_ones)
 for i in range(2, 7):
 	decisionTree = Tree()
 	decisionTree = createTree(1, i, rootNode)
@@ -446,8 +438,7 @@ for i in range(2, 7):
 	print totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0)))
 
 	print "\n"
-# print totalTrainList
-# print totalTestList
+
 plt.figure(1)
 plt.ylabel('Error Rates')
 plt.xlabel('D Features')

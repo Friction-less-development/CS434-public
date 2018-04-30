@@ -305,6 +305,24 @@ def calcAccuracyTrain(treeNode): # need threshold and feature for node
     totalRatio = totalRatio * 100
     return totalRatio
 
+def numNodes(treeNode, totalNodes):
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalNodes += 1
+		totalNodes = numNodes(treeNode.leftChild, totalNodes)
+		totalNodes = numNodes(treeNode.rightChild, totalNodes)
+		return totalNodes
+	else:
+		return totalNodes
+
+def totalTreeCalc(treeNode): # start with root node
+	totalSumRatio = 0.0
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalSumRatio += calcAccuracyTrain(treeNode)
+		totalSumRatio += totalTreeCalc(treeNode.leftChild)
+		totalSumRatio += totalTreeCalc(treeNode.rightChild)
+	return totalSumRatio
+
+
 def calcAccuracyTest(treeNode): # need threshold and feature for node
     firstLine = True
     XT = np.zeros(shape=(1,31)) # Matrix of data
@@ -382,7 +400,5 @@ print(rootNode.informationGain)
 
 decisionTree = Tree()
 decisionTree = createTree(1, 3, rootNode)
-    
-
-            
-    
+# print numNodes(decisionTree, 0)
+print totalTreeCalc(decisionTree)/(float(numNodes(decisionTree, 0)))

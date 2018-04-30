@@ -163,7 +163,116 @@ def findSplit(Xset, yset):
 def createTree():
     
     return test
+    
+def calcAccuracyTrain(treeNode): # need threshold and feature for node
+	firstLine = True
+	XT = np.zeros(shape=(1,31)) # Matrix of data
+	with open('knn_train.csv','r') as f:
+	    for line in f:
+	        featureNum = 0
+	        lineWords = []
+	        averageValue = []
+	        for word in line.split(','):
+	           if featureNum >= 0:
+	               lineWords.append(float(word))
+	               featureNum += 1
+	        if firstLine:
+	            XT[0] = lineWords
+	            firstLine = False
+	        else:
+	            XT = np.vstack((XT, lineWords))
+	leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+	rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+	rightBranch = []
+	leftBranch = []
+	rightBranchNumPositive = 0
+	rightBranchNumNegative = 0
+	leftBranchNumWNegative = 0
+	leftBranchNumPositive = 0
+	for i in range(0, np.size(XT, 0)):
+		if XT[i][treeNode.feature] > treeNode.threshold:
+			rightBranch.append(XT[i][treeNode.feature])
+			if XT[i][0] == 1:
+				rightBranchNumPositive += 1
+			else:
+				rightBranchNumNegative += 1
+		else:
+			leftBranch.append(XT[i][treeNode.feature])
+			if XT[i][0] == 1:
+				leftBranchNumPositive += 1
+			else:
+				leftBranchNumWNegative += 1
+	if np.size(leftBranch) == 0:
+		leftBranchRatio = 0
+	elif leftBranchNumWNegative > leftBranchNumPositive:
+		leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+	else:
+		leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+	if np.size(rightBranch) == 0:
+		rightBranchRatio = 0
+	elif rightBranchNumNegative > rightBranchNumPositive:
+		rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+	else:
+		rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+	totalRatio = 0.0
+	totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(XT, 0)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(XT, 0)))
+	totalRatio = totalRatio * 100
+	return totalRatio
 
+def calcAccuracyTest(treeNode): # need threshold and feature for node
+	firstLine = True
+	XT = np.zeros(shape=(1,31)) # Matrix of data
+	with open('knn_test.csv','r') as f:
+	    for line in f:
+	        featureNum = 0
+	        lineWords = []
+	        averageValue = []
+	        for word in line.split(','):
+	           if featureNum >= 0:
+	               lineWords.append(float(word))
+	               featureNum += 1
+	        if firstLine:
+	            XT[0] = lineWords
+	            firstLine = False
+	        else:
+	            XT = np.vstack((XT, lineWords))
+	leftBranchRatio = 0.0 # left branch for ratio of correct/totalRightBranch with regard to branch label
+	rightBranchRatio = 0.0 # right branch for ratio of correct/totalRightBranch with regard to branch label
+	rightBranch = []
+	leftBranch = []
+	rightBranchNumPositive = 0
+	rightBranchNumNegative = 0
+	leftBranchNumWNegative = 0
+	leftBranchNumPositive = 0
+	for i in range(0, np.size(XT, 0)):
+		if XT[i][treeNode.feature] > treeNode.threshold:
+			rightBranch.append(XT[i][treeNode.feature])
+			if XT[i][0] == 1:
+				rightBranchNumPositive += 1
+			else:
+				rightBranchNumNegative += 1
+		else:
+			leftBranch.append(XT[i][treeNode.feature])
+			if XT[i][0] == 1:
+				leftBranchNumPositive += 1
+			else:
+				leftBranchNumWNegative += 1
+	if np.size(leftBranch) == 0:
+		leftBranchRatio = 0
+	elif leftBranchNumWNegative > leftBranchNumPositive:
+		leftBranchRatio = leftBranchNumWNegative/float(np.size(leftBranch))*100
+	else:
+		leftBranchRatio = leftBranchNumPositive/float(np.size(leftBranch))*100
+	if np.size(rightBranch) == 0:
+		rightBranchRatio = 0
+	elif rightBranchNumNegative > rightBranchNumPositive:
+		rightBranchRatio = rightBranchNumNegative/float(np.size(rightBranch))*100
+	else:
+		rightBranchRatio = rightBranchNumPositive/float(np.size(rightBranch))*100
+	totalRatio = 0.0
+	totalRatio = rightBranchRatio/100.0*(np.size(rightBranch)/float(np.size(XT, 0)))+leftBranchRatio/100.0*(np.size(leftBranch)/float(np.size(XT, 0)))
+	totalRatio = totalRatio * 100
+	return totalRatio
 
     
 rootNode = Tree()
@@ -172,6 +281,8 @@ rootNode = findSplit(XTrain, yTrain)
 print(rootNode.feature)
 print(rootNode.threshold)
 print(rootNode.informationGain)
+print "Training accuracy: ", calcAccuracyTrain(rootNode)
+print "Test Accuracy: ", calcAccuracyTest(rootNode)
     
 # XleftSplit, XrightSplit, yLeftSplit, yLeftSplit = split(XTrain, 10, .1)
 # print(len(XleftSplit))

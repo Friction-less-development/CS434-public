@@ -103,7 +103,23 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
     else:
         temp = -posNegativeRatio*np.log2(posNegativeRatio)-negPositiveRatio*np.log2(negPositiveRatio)
     hSList.append(temp)
-    hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+    # print numLeftPositives
+    # print numRightPositives
+    # print numLeftNegatives
+    # print numRightNegatives
+    if (numLeftPositives == 0 and numRightPositives == 0):
+    	hS = -(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+    elif (numLeftNegatives == 0 and numRightNegatives == 0):
+    	hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+    else:
+    	hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
+
+  #   if hS == 0 or hS != hS:
+		# print numLeftPositives
+		# print numRightPositives
+		# print numLeftNegatives
+		# print numRightNegatives
+		# print "\n"
     return (hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[0]-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[1])
 
 # data is our dataset (X)
@@ -132,7 +148,8 @@ def findSplit(Xset):
     maxIgain = 0.0
     featureIndex = -1
     finalThreshold = -1
-    
+    bestXleftSplit = []
+    bestXrightSplit = []
     for feature in range(numFeatures):
         for sample in range(numSamples):
             current = Xset[sample]
@@ -314,12 +331,12 @@ def numNodes(treeNode, totalNodes):
 	else:
 		return totalNodes
 
-def totalTreeCalc(treeNode): # start with root node
+def totalTreeCalcTrain(treeNode): # start with root node
 	totalSumRatio = 0.0
 	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
 		totalSumRatio += calcAccuracyTrain(treeNode)
-		totalSumRatio += totalTreeCalc(treeNode.leftChild)
-		totalSumRatio += totalTreeCalc(treeNode.rightChild)
+		totalSumRatio += totalTreeCalcTrain(treeNode.leftChild)
+		totalSumRatio += totalTreeCalcTrain(treeNode.rightChild)
 	return totalSumRatio
 
 
@@ -378,6 +395,14 @@ def calcAccuracyTest(treeNode): # need threshold and feature for node
     totalRatio = totalRatio * 100
     return totalRatio
 
+def totalTreeCalcTest(treeNode): # start with root node
+	totalSumRatio = 0.0
+	if treeNode.classification != 1 and treeNode.classification != 1 and treeNode.feature != None:
+		totalSumRatio += calcAccuracyTest(treeNode)
+		totalSumRatio += totalTreeCalcTest(treeNode.leftChild)
+		totalSumRatio += totalTreeCalcTest(treeNode.rightChild)
+	return totalSumRatio
+
     
 rootNode = Tree()
 
@@ -392,13 +417,25 @@ rootNode = findSplit(xStartingSet)
 print(rootNode.feature)
 print(rootNode.threshold)
 print(rootNode.informationGain)
+print "d = 1"
+print "Training: "
+print calcAccuracyTrain(rootNode)
+print "Test: "
+print calcAccuracyTest(rootNode)
+print "\n"
 
 # num_negativeOnes = (yTrain == -1).sum()
 # num_ones = (yTrain == 1).sum()
 
 # print(num_negativeOnes, " ", num_ones)
+for i in range(2, 7):
+	decisionTree = Tree()
+	decisionTree = createTree(1, i, rootNode)
+	print "d = ", i
+	# print numNodes(decisionTree, 0)
+	print "Training: "
+	print totalTreeCalcTrain(decisionTree)/(float(numNodes(decisionTree, 0)))
+	print "Test: "
+	print totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0)))
 
-decisionTree = Tree()
-decisionTree = createTree(1, 3, rootNode)
-# print numNodes(decisionTree, 0)
-print totalTreeCalc(decisionTree)/(float(numNodes(decisionTree, 0)))
+	print "\n"

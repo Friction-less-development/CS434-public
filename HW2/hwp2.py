@@ -38,8 +38,8 @@ XTrain = np.delete(X, 0, 1)
 #normalize data between 0 and 1
 XTrain = (XTrain - XTrain.min(0)) / XTrain.ptp(0)
 
-print("x shape: " , XTrain.shape)
-print("y shape: " , yTrain.shape)
+# print("x shape: " , XTrain.shape)
+# print("y shape: " , yTrain.shape)
 
 # tree class.
 class Tree(object):
@@ -414,9 +414,10 @@ rootNode = findSplit(xStartingSet)
 
 
 
-print(rootNode.feature)
-print(rootNode.threshold)
-print(rootNode.informationGain)
+# print(rootNode.feature)
+# print(rootNode.threshold)
+# print(rootNode.informationGain)
+
 print "d = 1"
 print "Training: "
 print calcAccuracyTrain(rootNode)
@@ -424,6 +425,10 @@ print "Test: "
 print calcAccuracyTest(rootNode)
 print "\n"
 
+totalTrainList = []
+totalTestList = []
+totalTrainList.append(calcAccuracyTrain(rootNode))
+totalTestList.append(calcAccuracyTest(rootNode))
 # num_negativeOnes = (yTrain == -1).sum()
 # num_ones = (yTrain == 1).sum()
 
@@ -434,8 +439,24 @@ for i in range(2, 7):
 	print "d = ", i
 	# print numNodes(decisionTree, 0)
 	print "Training: "
+	totalTrainList.append(totalTreeCalcTrain(decisionTree)/(float(numNodes(decisionTree, 0))))
+	totalTestList.append(totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0))))
 	print totalTreeCalcTrain(decisionTree)/(float(numNodes(decisionTree, 0)))
 	print "Test: "
 	print totalTreeCalcTest(decisionTree)/(float(numNodes(decisionTree, 0)))
 
 	print "\n"
+# print totalTrainList
+# print totalTestList
+plt.figure(1)
+plt.ylabel('Error Rates')
+plt.xlabel('D Features')
+xAxis = [1, 2, 3, 4, 5, 6]
+plt.title('Number of Features VS Error Rate')
+plt.plot(xAxis, totalTrainList, 'ro', label='Training Data')
+plt.plot(xAxis, totalTestList, 'bo', label='Test Data')
+
+plt.axis([0,8, 50, 85])
+
+plt.legend()
+plt.savefig('p2p2.png')

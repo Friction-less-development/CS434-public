@@ -414,9 +414,9 @@ rootNode = findSplit(xStartingSet)
 
 
 
-# print(rootNode.feature)
-# print(rootNode.threshold)
-# print(rootNode.informationGain)
+print(rootNode.feature)
+print(rootNode.threshold)
+print(rootNode.informationGain)
 
 print "d = 1"
 print "Training: "

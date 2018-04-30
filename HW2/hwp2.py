@@ -101,7 +101,7 @@ def infoGain(XleftSplit, XrightSplit): # need to store what you find in a list o
         temp = -posNegativeRatio*np.log2(posNegativeRatio)-negPositiveRatio*np.log2(negPositiveRatio)
     hSList.append(temp)
     hS = -(numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftPositives+numRightPositives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))-(numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*np.log2((numLeftNegatives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit))))
-    return hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))
+    return (hS - (numLeftPositives+numLeftNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[0]-(numRightPositives+numRightNegatives)/(float(np.size(XleftSplit)+np.size(XrightSplit)))*hSList[1])
 
 # data is our dataset (X)
 # index is the index of the feature we're splitting on
@@ -127,7 +127,7 @@ def findSplit(Xset, yset):
     print(Xset.shape)
     print("numfeatures: ", numFeatures)
     
-    maxIgain = 0
+    maxIgain = 0.0
     bestXleftSplit = -1 
     bestXrightSplit = -1
     featureIndex = -1
@@ -152,7 +152,7 @@ def findSplit(Xset, yset):
     node = Tree()
 
     node.xLeft = bestXleftSplit
-    node.xRight = bestXRightSplit
+    node.xRight = bestXrightSplit
     node.feature = featureIndex
     node.informationGain = maxIgain
     node.threshold = finalThreshold

@@ -19,22 +19,22 @@ print('Using PyTorch version:', torch.__version__, 'CUDA:', cuda)
 #torch.manual_seed(42)
 #if cuda:
 #    torch.cuda.manual_seed(42)
-batch_size = 32
+batch_size = 4
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.MNIST('../data', train=True, download=True,
+    datasets.CIFAR10('../data', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
+                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                    ])),
     batch_size=batch_size, shuffle=True, **kwargs)
 
 validation_loader = torch.utils.data.DataLoader(
-    datasets.MNIST('../data', train=False, transform=transforms.Compose([
+    datasets.CIFAR10('../data', train=False, transform=transforms.Compose([
                        transforms.ToTensor(),
-                       transforms.Normalize((0.1307,), (0.3081,))
+                       transforms.Normalize((.5,), (.5,))
                    ])),
     batch_size=batch_size, shuffle=False, **kwargs)
 
@@ -46,23 +46,23 @@ for (X_train, y_train) in train_loader:
 pltsize=1
 plt.figure(figsize=(10*pltsize, pltsize))
 
-for i in range(10):
-    plt.subplot(1,10,i+1)
-    plt.axis('off')
-    plt.imshow(X_train[i,:,:,:].numpy().reshape(28,28), cmap="gray")
-    plt.title('Class: '+str(y_train[i]))
+# for i in range(10):
+#     plt.subplot(1,10,i+1)
+#     plt.axis('off')
+#     plt.imshow(X_train[i,:,:,:].numpy().reshape(32,32), cmap="gray")
+#     plt.title('Class: '+str(y_train[i]))
 
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(28*28, 50)
+        self.fc1 = nn.Linear(32*32*3, 50)
         self.fc1_drop = nn.Dropout(0.2)
         self.fc2 = nn.Linear(50, 50)
         self.fc2_drop = nn.Dropout(0.2)
         self.fc3 = nn.Linear(50, 10)
 
     def forward(self, x):
-        x = x.view(-1, 28*28)
+        x = x.view(-1, 32*32*3)
         x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
         x = F.relu(self.fc2(x))
@@ -72,7 +72,7 @@ class Net(nn.Module):
 model = Net()
 if cuda:
     model.cuda()
-    
+
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
 print(model)
@@ -85,6 +85,11 @@ def train(epoch, log_interval=100):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model(data)
+
+        # print '\n\n', 'output type: ', output.type(), ' ', output.size(), '\n\n'
+        # print '\n\n', 'target type: ', target.type(), ' ', target.size(), '\n\n'
+
+
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
@@ -110,22 +115,22 @@ def validate(loss_vector, accuracy_vector):
 
     accuracy = 100. * correct / len(validation_loader.dataset)
     accuracy_vector.append(accuracy)
-    
+
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         val_loss, correct, len(validation_loader.dataset), accuracy))
 
 # %%time
-epochs = 10
+epochs = 5
 
 lossv, accv = [], []
 for epoch in range(1, epochs + 1):
     train(epoch)
     validate(lossv, accv)
 
-plt.figure(figsize=(5,3))
-plt.plot(np.arange(1,epochs+1), lossv)
-plt.title('validation loss')
-
-plt.figure(figsize=(5,3))
-plt.plot(np.arange(1,epochs+1), accv)
-plt.title('validation accuracy');
+# plt.figure(figsize=(5,3))
+# plt.plot(np.arange(1,epochs+1), lossv)
+# plt.title('validation loss')
+#
+# plt.figure(figsize=(5,3))
+# plt.plot(np.arange(1,epochs+1), accv)
+# plt.title('validation accuracy');

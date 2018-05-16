@@ -11,6 +11,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
+import itertools
 # import seaborn as sns
 
 cuda = torch.cuda.is_available()
@@ -27,17 +28,17 @@ train_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('./data', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
-                       #transforms.Normalize((0.1307,), (0.3081,))
+                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                    ])),
     batch_size=batch_size, shuffle=True, **kwargs)
 
 validation_loader = torch.utils.data.DataLoader(
     datasets.CIFAR10('./data', train=False, transform=transforms.Compose([
                        transforms.ToTensor(),
-                       #transforms.Normalize((0.1307,), (0.3081,))
+                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                    ])),
     batch_size=batch_size, shuffle=False, **kwargs)
-    
+
 print validation_loader
 
 for (X_train, y_train) in train_loader:
@@ -82,7 +83,15 @@ if cuda:
 print(model)
 
 def train(epoch, optimizer, log_interval=100):
+
+    # end position of training set (first 4 batches AKA first 4/5s of the training set)
+    trainingEndIndex = int(len(train_loader)*.8)
+
+    print "\nlength of train_loader: ", len(train_loader)
+    print "\nlength of validation_loader: ", len(validation_loader)
+
     model.train()
+
     for batch_idx, (data, target) in enumerate(train_loader):
         if cuda:
             data, target = data.cuda(), target.cuda()
@@ -94,10 +103,45 @@ def train(epoch, optimizer, log_interval=100):
         optimizer.step()
         if batch_idx % log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.data[0]))
+                epoch, batch_idx * len(data), 40000, # was len(train_loader.dataset)
+                100. * batch_idx / (len(train_loader)*.8), loss.data[0]))
+
+        # only train on the first 40k samples (batch 1 - 4)
+        if batch_idx >= trainingEndIndex:
+            break
 
 def validate(loss_vector, accuracy_vector):
+    # print "\nlength of train_loader: ", len(train_loader)
+    # print "\nlength of validation_loader: ", len(validation_loader)
+
+    # start position of validation set (last batch AKA last 4/5s of the training set)
+    validationStartingIndex = int(len(train_loader)*.8)
+    model.eval()
+    val_loss, correct = 0, 0
+    sampleCount = 0
+    # for data, target in validation_loader:
+    for sample_idx, (data, target) in enumerate(train_loader):
+        # print sample_idx, " ", sampleCount, "    "
+        if sample_idx > validationStartingIndex:
+            if cuda:
+                data, target = data.cuda(), target.cuda()
+            data, target = Variable(data, volatile=True), Variable(target)
+            output = model(data)
+            val_loss += F.nll_loss(output, target).data[0]
+            pred = output.data.max(1)[1] # get the index of the max log-probability
+            correct += pred.eq(target.data).cpu().sum()
+            sampleCount += 1
+
+    val_loss /= len(validation_loader)
+    loss_vector.append(val_loss)
+
+    accuracy = 100. * correct / 10000 # was len(validation_loader.dataset) 
+    accuracy_vector.append(accuracy)
+
+    print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        val_loss, correct, 10000, accuracy)) # was len(validation_loader.dataset) 
+
+def test(loss_vector, accuracy_vector):
     model.eval()
     val_loss, correct = 0, 0
     for data, target in validation_loader:
@@ -115,7 +159,7 @@ def validate(loss_vector, accuracy_vector):
     accuracy = 100. * correct / len(validation_loader.dataset)
     accuracy_vector.append(accuracy)
 
-    print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         val_loss, correct, len(validation_loader.dataset), accuracy))
 
 # %%time

@@ -19,12 +19,12 @@ print('Using PyTorch version:', torch.__version__, 'CUDA:', cuda)
 #torch.manual_seed(42)
 #if cuda:
 #    torch.cuda.manual_seed(42)
-batch_size = 10000
+batch_size = 32
 
 kwargs = {'num_workers': 1, 'pin_memory': True} if cuda else {}
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.CIFAR10('../data', train=True, download=True,
+    datasets.CIFAR10('./data', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
                        #transforms.Normalize((0.1307,), (0.3081,))
@@ -32,7 +32,7 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=batch_size, shuffle=True, **kwargs)
 
 validation_loader = torch.utils.data.DataLoader(
-    datasets.CIFAR10('../data', train=False, transform=transforms.Compose([
+    datasets.CIFAR10('./data', train=False, transform=transforms.Compose([
                        transforms.ToTensor(),
                        #transforms.Normalize((0.1307,), (0.3081,))
                    ])),
@@ -77,11 +77,11 @@ model = Net()
 if cuda:
     model.cuda()
 
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+# optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
 print(model)
 
-def train(epoch, log_interval=100):
+def train(epoch, optimizer, log_interval=100):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         if cuda:
@@ -120,17 +120,32 @@ def validate(loss_vector, accuracy_vector):
 
 # %%time
 epochs = 10
-
-lossv, accv = [], []
-for epoch in range(1, epochs + 1):
-    train(epoch)
-    validate(lossv, accv)
-
+learningRates = [0.1]
+lossvE, accvE = [], []
+for i in learningRates:
+	optimizer = optim.SGD(model.parameters(), lr=i, momentum=0.5)
+	lossv, accv = [], []
+	for epoch in range(1, epochs + 1):
+	    train(epoch, optimizer)
+	    validate(lossv, accv)
+	lossvE.append(lossv)
+	accvE.append(accv)
 plt.figure(figsize=(5,3))
-plt.plot(np.arange(1,epochs+1), lossv)
+plt.ylabel('Negative Log Loss')
+plt.xlabel('Epochs')
+plt.plot(np.arange(1,epochs+1), lossvE[0], label='LR: 0.1')
+# plt.plot(np.arange(1,epochs+1), lossvE[1], label='LR: 0.01')
 plt.title('validation loss')
+plt.legend()
+plt.tight_layout()
+plt.savefig('p1part1Loss.png')
 
 plt.figure(figsize=(5,3))
-plt.plot(np.arange(1,epochs+1), accv)
+plt.ylabel('Accuracy')
+plt.xlabel('Epochs')
+plt.plot(np.arange(1,epochs+1), accvE[0], label='LR: 0.1')
+# plt.plot(np.arange(1,epochs+1), accvE[1], label='LR: 0.01')
 plt.title('validation accuracy');
-plt.savefig('p1part1.png')
+plt.legend()
+plt.tight_layout()
+plt.savefig('p1part1Validation.png')

@@ -164,7 +164,7 @@ def test(loss_vector, accuracy_vector):
 
 # %%time
 epochs = 10
-learningRates = [0.001]
+learningRates = [0.0001]
 lossvE, accvE = [], []
 for i in learningRates:
     optimizer = optim.SGD(model.parameters(), lr=i, momentum=0.5)
@@ -179,21 +179,21 @@ plt.ylabel('Negative Log Loss')
 plt.xlabel('Epochs')
 # plt.plot(np.arange(1,epochs+1), lossvE[0], color="cyan", label='LR: 0.1')
 # plt.plot(np.arange(1,epochs+1), lossvE[0], color="red", label='LR: 0.01')
-plt.plot(np.arange(1,epochs+1), lossvE[0], color="green", label='LR: 0.001')
-# plt.plot(np.arange(1,epochs+1), lossvE[0], color="blue", label='LR: 0.0001')
-plt.title('Validation Loss')
+# plt.plot(np.arange(1,epochs+1), lossvE[0], color="green", label='LR: 0.001')
+plt.plot(np.arange(1,epochs+1), lossvE[0], color="blue", label='LR: 0.0001')
+plt.title('Average Loss')
 plt.legend()
 plt.tight_layout()
-plt.savefig('p2partLoss001.png')
+plt.savefig('p2partLoss0001.png')
 
 plt.figure(figsize=(10,8))
 plt.ylabel('Accuracy')
 plt.xlabel('Epochs')
 # plt.plot(np.arange(1,epochs+1), accvE[0], color="cyan", label='LR: 0.1')
 # plt.plot(np.arange(1,epochs+1), accvE[0], color="red", label='LR: 0.01')
-plt.plot(np.arange(1,epochs+1), accvE[0], color="green", label='LR: 0.001')
-# plt.plot(np.arange(1,epochs+1), accvE[0], color="blue", label='LR: 0.0001')
+# plt.plot(np.arange(1,epochs+1), accvE[0], color="green", label='LR: 0.001')
+plt.plot(np.arange(1,epochs+1), accvE[0], color="blue", label='LR: 0.0001')
 plt.title('Validation Accuracy');
 plt.legend()
 plt.tight_layout()
-plt.savefig('p2partValidation001.png')
+plt.savefig('p2partValidation0001.png')

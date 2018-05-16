@@ -71,7 +71,7 @@ class Net(nn.Module):
         x = x.view(-1, 32*32*3)
         x = self.sig(self.fc1(x))
         x = self.fc1_drop(x)
-        x = self.sig(self.fc2(x))
+        x = self.fc2(x)
         return F.log_softmax(x)
 
 model = Net()

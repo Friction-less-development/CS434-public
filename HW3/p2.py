@@ -87,8 +87,8 @@ def train(epoch, optimizer, log_interval=100):
     # end position of training set (first 4 batches AKA first 4/5s of the training set)
     trainingEndIndex = int(len(train_loader)*.8)
 
-    print "\nlength of train_loader: ", len(train_loader)
-    print "\nlength of validation_loader: ", len(validation_loader)
+    # print "\nlength of train_loader: ", len(train_loader)
+    # print "\nlength of validation_loader: ", len(validation_loader)
 
     model.train()
 
@@ -154,10 +154,10 @@ def test(loss_vector, accuracy_vector):
         correct += pred.eq(target.data).cpu().sum()
 
     val_loss /= len(validation_loader)
-    loss_vector.append(val_loss)
+    # loss_vector.append(val_loss)
 
     accuracy = 100. * correct / len(validation_loader.dataset)
-    accuracy_vector.append(accuracy)
+    # accuracy_vector.append(accuracy)
 
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         val_loss, correct, len(validation_loader.dataset), accuracy))

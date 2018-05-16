@@ -1,6 +1,7 @@
 # from IPython import get_ipython
 # get_ipython().run_line_magic('matplotlib', 'inline')
-
+# HOW TO RUN:  python p2.py
+#  To use different LEARNING RATES: change line 169
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -174,6 +175,8 @@ for i in learningRates:
         validate(lossv, accv)
     lossvE.append(lossv)
     accvE.append(accv)
+lossv, accv = [], []
+test(lossv, accv)
 plt.figure(figsize=(10,8))
 plt.ylabel('Negative Log Loss')
 plt.xlabel('Epochs')

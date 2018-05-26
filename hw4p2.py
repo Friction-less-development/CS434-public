@@ -30,11 +30,11 @@ for i in range(0, 784):
 	mean_list.append(np.mean(X[i, :]))
 
 mean_vector = np.array(mean_list)
-print('Mean Vector:\n', mean_vector)
+#print("Mean Vector:\n", mean_vector)
 cov_mat = np.cov(X)
-print('Covariance Matrix:\n', cov_mat)
+#print("Covariance Matrix:\n", cov_mat)
 plt.title("Mean Image")
-print np.shape(mean_vector)
+
 plt.imshow(np.reshape(mean_vector,(28,28)))
 plt.savefig("mean.png")
 
@@ -48,22 +48,43 @@ eig_val_cov, eig_vec_cov = np.linalg.eig(cov_mat)
 # 	print(40 * '-')
 
 # Make a list of (eigenvalue, eigenvector) tuples
+
 eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
+print np.shape(eig_pairs[0][1])
+topEigenVals = []
+counter = 0;
 
 # Sort the (eigenvalue, eigenvector) tuples from high to low
 eig_pairs.sort(key=lambda x: x[0], reverse=True)
+print "Top 10 eigen values: "
+for i in eig_pairs:
+	if(counter==10):
+		break
+	print(i[0])
+	topEigenVals.append(i[0])
+	counter += 1
+
+#for i in range(0, 10):
+	#np.multiply(eig_pairs[i][0], np.amax(eig_pairs[i][0]))
 
 matrix_w = np.hstack((eig_pairs[0][1].reshape(6000,1), eig_pairs[1][1].reshape(6000,1), eig_pairs[2][1].reshape(6000,1), eig_pairs[3][1].reshape(6000,1), eig_pairs[4][1].reshape(6000,1), eig_pairs[5][1].reshape(6000,1), eig_pairs[6][1].reshape(6000,1), eig_pairs[7][1].reshape(6000,1), eig_pairs[8][1].reshape(6000,1), eig_pairs[9][1].reshape(6000,1)))
 
-print('Matrix W:\n', matrix_w)
-print matrix_w
+#print('Matrix W:\n', matrix_w)
+#print np.shape(matrix_w)
+transformed = []
+transformedT = matrix_w.T.dot(X)
+for i in range(0, 10):
+	transformed.append(np.multiply(transformedT[i], topEigenVals[i]))
+#print transformed
+print transformed[0]
+#print np.shape(transformed)
 fileName = "eigen"
 fileExtension = ".png"
 for i in range(0, 10):
 	fileTitle = "Eigen"
 	fileTitle += str(i)
 	plt.title(fileTitle)
-	plt.imshow(np.reshape(matrix_w[i],(28,28)))
+	plt.imshow(np.reshape(transformed[i],(28,28)))
 	fileSave = fileName
 	fileSave += i
 	fileSave += fileExtension

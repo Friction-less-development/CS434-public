@@ -26,12 +26,20 @@ with open('data-1.txt','r') as f:
             lines += 1
 
 mean_list = []
+cov_matrix = np.zeros(shape=(1, 784))
 for i in range(0, 784):
 	mean_list.append(np.mean(X[i, :]))
 
+for i in range(0, 784):
+	if(i==0):
+		cov_matrix[0] = X[i, :]
+	else:		
+		cov_matrix = np.vstack((cov_matrix, X[i, :]))
+
 mean_vector = np.array(mean_list)
 #print("Mean Vector:\n", mean_vector)
-cov_mat = np.cov(X)
+cov_mat = np.cov(cov_matrix)
+print np.shape(cov_mat)
 #print("Covariance Matrix:\n", cov_mat)
 plt.title("Mean Image")
 
@@ -64,29 +72,34 @@ for i in eig_pairs:
 	topEigenVals.append(i[0])
 	counter += 1
 
+print "\n"
 #for i in range(0, 10):
 	#np.multiply(eig_pairs[i][0], np.amax(eig_pairs[i][0]))
 
-matrix_w = np.hstack((eig_pairs[0][1].reshape(6000,1), eig_pairs[1][1].reshape(6000,1), eig_pairs[2][1].reshape(6000,1), eig_pairs[3][1].reshape(6000,1), eig_pairs[4][1].reshape(6000,1), eig_pairs[5][1].reshape(6000,1), eig_pairs[6][1].reshape(6000,1), eig_pairs[7][1].reshape(6000,1), eig_pairs[8][1].reshape(6000,1), eig_pairs[9][1].reshape(6000,1)))
+matrix_w = np.hstack((eig_pairs[0][1].reshape(784,1), eig_pairs[1][1].reshape(784,1), eig_pairs[2][1].reshape(784,1), eig_pairs[3][1].reshape(784,1), eig_pairs[4][1].reshape(784,1), eig_pairs[5][1].reshape(784,1), eig_pairs[6][1].reshape(784,1), eig_pairs[7][1].reshape(784,1), eig_pairs[8][1].reshape(784,1), eig_pairs[9][1].reshape(784,1)))
 
-#print('Matrix W:\n', matrix_w)
-#print np.shape(matrix_w)
-transformed = []
-transformedT = matrix_w.T.dot(X)
+print('Matrix W:\n', matrix_w)
+print np.shape(matrix_w)
+print np.shape(topEigenVals)
+#transformed = np.zeros(shape=(10, 784))
+#transformedT = matrix_w.T.dot(X)
 for i in range(0, 10):
-	transformed.append(np.multiply(transformedT[i], topEigenVals[i]))
+	for j in range(0, 784):
+		matrix_w[j][i] = matrix_w[j][i] * topEigenVals[i]
+
+transformed = matrix_w.real
+
+print('Matrix W changed:\n', transformed)
 #print transformed
-print transformed[0]
-#print np.shape(transformed)
 fileName = "eigen"
 fileExtension = ".png"
 for i in range(0, 10):
 	fileTitle = "Eigen"
 	fileTitle += str(i)
 	plt.title(fileTitle)
-	plt.imshow(np.reshape(transformed[i],(28,28)))
+	plt.imshow(np.reshape(transformed[:, i],(28,28)))
 	fileSave = fileName
-	fileSave += i
+	fileSave += str(i)
 	fileSave += fileExtension
 	plt.savefig(fileSave)
 

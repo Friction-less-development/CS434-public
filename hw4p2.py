@@ -85,7 +85,7 @@ print np.shape(topEigenVals)
 #transformedT = matrix_w.T.dot(X)
 for i in range(0, 10):
 	for j in range(0, 784):
-		matrix_w[j][i] = matrix_w[j][i] * topEigenVals[i]
+		matrix_w[j][i] = abs(matrix_w[j][i] * topEigenVals[i])
 
 transformed = matrix_w.real
 

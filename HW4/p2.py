@@ -29,6 +29,11 @@ meanX = np.zeros(shape=(784, 1))
 meanX = np.mean(X, axis=0)
 X = X - meanX
 
+plt.title("Mean Image")
+
+plt.imshow(np.reshape(meanX,(28,28)))
+plt.savefig("mean.png")
+
 R = np.cov(X, rowvar=False)
 from scipy import linalg as LA
 
@@ -36,9 +41,20 @@ evals, evecs = LA.eig(R)
 idx = np.argsort(evals)[::-1]
 evecs = evecs[:,idx]
 
+
 evals = evals[idx]
+evalsReal = evals.real
 evecs = evecs[:, :10]
 transformed = evecs.real
+counter = 0
+print "Top 10 eigen values: "
+for i in evalsReal:
+	if(counter==10):
+		break
+	print(i)
+	counter += 1
+
+print "\n"
 
 
 fileName = "eigen"

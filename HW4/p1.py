@@ -41,7 +41,7 @@ def kmeans(data, k, iterations):
     centers = []
     SSElist = []
     for s in range (0, k):
-        centers.append(data[randint(0,rows)])
+        centers.append(data[randint(0,rows-1)])
     
     previousLabels = []
     currentLabels = []

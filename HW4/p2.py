@@ -4,6 +4,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+#Run using python 2.7.5: python p2.py
 #sources: 	http://sebastianraschka.com/Articles/2014_pca_step_by_step.html
 #			https://stackoverflow.com/questions/13224362/principal-component-analysis-pca-in-python
 

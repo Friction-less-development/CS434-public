@@ -163,7 +163,7 @@ plt.show()
 iterations = 10
 k = 2
 SSElist = kmeans(X, k, iterations)
-
+myX = range(1, iterations+1)
 label = "K = " + str(k)
 plt.figure(figsize=(10,8))
 plt.ylabel('Sum of Errors')

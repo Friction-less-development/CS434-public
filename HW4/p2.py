@@ -83,6 +83,7 @@ for i in range(0, 6000):
 			closestFittingTracker[j, 0] = transformedX[i, j]
 			closestFitting[j,0] = i
 print(closestFittingTracker)
+print "Following are the image numbers:"
 print(closestFitting)
 
 fileName = "eigenmatch"

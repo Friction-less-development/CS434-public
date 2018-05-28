@@ -114,7 +114,7 @@ def calcBestCluster(centers, sample):
 
 multSSE = []
 iterations = 10
-maxK = 20
+maxK = 10
 maxK += 1
 for k in range(2, maxK):
 #     print("K = ", k, "\n")

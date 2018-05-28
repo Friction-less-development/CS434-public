@@ -34,7 +34,7 @@ print(X.shape)
 
 # k-means function
 def kmeans(data, k, iterations):
-    print("Starting K-means.\n K = ", k, "\n")
+    print "Starting K-means. ", "K = ", k, "\n"
     
     # start with k random centers chosen from our data set
     rows, columns = data.shape
@@ -61,7 +61,7 @@ def kmeans(data, k, iterations):
         
         #compute SSE
         SSElist.append(computeSSE(centers, data, currentLabels))
-#         print( "Iteration: ", iters, " ", SSElist[iters], "\n")
+        print( "Iteration: ", iters, " ", SSElist[iters], "\n")
         
         iters += 1
         
@@ -140,7 +140,7 @@ for k in range(len(multSSE)):
 
 plt.legend(labels)
 plt.show()
-# plt.savefig('p1k2i20.png')
+plt.savefig('p1p2.png')
 
 
 myX = range(2, maxK)
@@ -149,7 +149,7 @@ plt.ylabel('SSE')
 plt.xlabel('# of clusters')
 plt.title('SSE compared to K')
 kYvector = []
-print("!!!!!!", iterations, " ", maxK)
+
 for t in range(len(multSSE)):
 #     print("t = ", t, "iterations = ", iterations, "\n")
     kYvector.append(multSSE[t][iterations-1])
@@ -172,5 +172,5 @@ plt.plot(myX, SSElist, color="blue", label=label)
 plt.title('K-Means Error')
 plt.legend()
 plt.show()
-# plt.savefig('p1k2i20.png')
+plt.savefig('p1p2.png')
 

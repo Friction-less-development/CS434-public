@@ -140,7 +140,7 @@ for k in range(len(multSSE)):
 
 plt.legend(labels)
 plt.show()
-plt.savefig('p1p2.png')
+plt.savefig('p1p1.png')
 
 
 myX = range(2, maxK)

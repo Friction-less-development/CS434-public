@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 #           http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 
 
-instance = np.zeros(shape=(6, 8))
+instance = np.zeros(shape=(7, 8))
 chunks = np.zeros(shape=(1, 8))
 chunksList = []
 SUB1 = np.zeros(shape=(1, 8))
@@ -70,14 +70,24 @@ for i in range (0, np.size(SUB1,0)):
 			temp = np.zeros(shape=(1, 8))
 			chunks = temp
 			counter = 0
-			print "bad: ", i
 		elif SUB1INDICES[i][0] - 1 != SUB1INDICES[i-1][0] and counter >= 6:
 			chunksList.append(chunks)
 			temp = np.zeros(shape=(1, 8))
 			chunks = temp
 			counter = 0
-			print "good: ", i
 
+for chunkI in chunksList:
+    temp = np.zeros(shape=(7, 8))
+    instance = temp
+    for j in range(0, len(chunkI)):
+        if j<7:
+            instance[j][:] = chunkI[j][:]
+        else:
+            tempNum = j%7-1
+            instance = np.delete(instance, tempNum, 0)
+            instance = np.vstack((instance, chunkI[j][:]))
+
+print np.shape(instance)
 print np.shape(chunks)
 print np.shape(chunksList)
 

@@ -4,6 +4,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.utils.class_weight import compute_class_weight
 
 #How to Run: python fp1_tree.py
 #Purpose of program: Final project for General Population Model Test using decision tree as our model 
@@ -18,12 +19,14 @@ chunks = np.zeros(shape=(1, numColumns))
 chunksList = []
 sub1HypoChunkList = []
 sub4HypoChunkList = []
+sub6HypoChunkList = []
+sub9HypoChunkList = []
+sub2HypoChunkList = [] # for verification subject
 SUB1 = np.zeros(shape=(1, numColumns)) 
 SUB1HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
 SUB1INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 1
 
 firstLine = True
-doubleCheck = 0
 with open('Subject_1.csv','r') as f:
     for line in f:
         featureNum = 0
@@ -34,7 +37,7 @@ with open('Subject_1.csv','r') as f:
            	  lineWords.append(float(word))
            	  featureNum += 1
             elif featureNum == 9:
-           	  averageValue.append(float(word))
+           	  averageValue.append(int(word))
             else:
               featureNum += 1
             # print lineWords
@@ -59,9 +62,11 @@ with open('list_1.csv','r') as f:
         	firstLine = False
         else:
         	SUB1INDICES = np.vstack((SUB1INDICES, lineWords))
-
+classWeights = compute_class_weight("balanced", [0., 1.], np.ravel(SUB1HYPO))
+# print classWeights
+# classWeights[0] = classWeights[0]/126. # can only put class weight of 0 in, so divide it by the wiehgt of class weight of 1, more or less.
 counter = 0 # must get to at least equaling 6, which is a minimum of 7 instances for a 30 minute period
-subForest = RandomForestClassifier(criterion="entropy", max_depth=2, random_state=0, warm_start=True)
+subForest = RandomForestClassifier(criterion="entropy", max_depth=5, random_state=0, warm_start=True, bootstrap=False, class_weight={0.:classWeights[0]}) # class_weight={0.:classWeights[0]}
 
 sub1HypoChunk = np.zeros(shape=(1,1))
 for i in range (0, np.size(SUB1,0)):
@@ -99,15 +104,15 @@ for i in range(0, len(chunksList)):
     temp = np.zeros(shape=(7, numColumns))
     instance = temp
     for j in range(0, len(chunksList[i])):
-        if j==len(chunksList[i])-1:
-            print i
+        # if j==len(chunksList[i])-1:
+        #     print i
             # print j
             # print instance
             # print sub1HypoChunk
             # print 5*"-"
         if j<7:
             instance[j][:] = chunksList[i][j][:]
-            sub1HypoChunk[j][0] = sub1HypoChunkList[i][j][0]
+            sub1HypoChunk[j][0] = int(sub1HypoChunkList[i][j][0])
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
@@ -117,7 +122,7 @@ for i in range(0, len(chunksList)):
             instance = np.delete(instance, tempNum, 0)
             sub1HypoChunk = np.delete(sub1HypoChunk, tempNum, 0)
             instance = np.vstack((instance, chunksList[i][j][:]))
-            sub1HypoChunk = np.vstack((sub1HypoChunk, sub1HypoChunkList[i][j][0]))
+            sub1HypoChunk = np.vstack((sub1HypoChunk, int(sub1HypoChunkList[i][j][0])))
 
 # print sub1HypoChunkList[0][349]
 # print sub1HypoChunkList[0][348]
@@ -126,9 +131,9 @@ for i in range(0, len(chunksList)):
 # print np.shape(chunks)
 print "\n"
 print "Subject_1"
-print np.shape(SUB1)
-print np.shape(SUB1HYPO)
-print np.shape(SUB1INDICES)
+# print np.shape(SUB1)
+# print np.shape(SUB1HYPO)
+# print np.shape(SUB1INDICES)
 
 # subForest.fit(SUB1, np.ravel(SUB1HYPO))
 # print subForest.feature_importances_
@@ -233,8 +238,8 @@ for i in range(0, len(chunksList)):
     temp = np.zeros(shape=(7, numColumns))
     instance = temp
     for j in range(0, len(chunksList[i])):
-        if j==len(chunksList[i])-1:
-            print i
+        # if j==len(chunksList[i])-1:
+        #     print i
             # print j
             # print instance
             # print sub4HypoChunk
@@ -254,9 +259,9 @@ for i in range(0, len(chunksList)):
             sub4HypoChunk = np.vstack((sub4HypoChunk, sub4HypoChunkList[i][j][0]))
 print "\n"
 print "Subject_4"
-print np.shape(SUB4)
-print np.shape(SUB4HYPO)
-print np.shape(SUB4INDICES)
+# print np.shape(SUB4)
+# print np.shape(SUB4HYPO)
+# print np.shape(SUB4INDICES)
 
 # subForest.fit(SUB4, np.ravel(SUB4HYPO))
 # print subForest.feature_importances_
@@ -317,11 +322,79 @@ with open('list_6.csv','r') as f:
         	firstLine = False
         else:
         	SUB6INDICES = np.vstack((SUB6INDICES, lineWords))
+templ = []
+chunksList = templ
+sub6HypoChunk = np.zeros(shape=(1,1))
+counter = 0
+tempc = np.zeros(shape=(1, numColumns)) 
+chunks = tempc
+for i in range (0, np.size(SUB6,0)):
+    if counter == 0:
+        sub6HypoChunk[0] = SUB6HYPO[i][:]
+        chunks[0] = SUB6[i][:]
+        counter += 1
+    else:
+        chunks = np.vstack((chunks, SUB6[i][:]))
+        sub6HypoChunk = np.vstack((sub6HypoChunk, SUB6HYPO[i][:]))
+        counter += 1
+    if i != 0:
+        if SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter < 6:
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            counter = 0
+            temp2 = np.zeros(shape=(1,1))
+            sub6HypoChunk = temp2
+        elif SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter >= 6:
+            sub6HypoChunkList.append(sub6HypoChunk)
+            chunksList.append(chunks)
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            temp2 = np.zeros(shape=(1,1))
+            sub6HypoChunk = temp2
+            counter = 0
 
+# print np.shape(chunksList)
+# print len(chunksList)
+# print np.shape(sub6HypoChunkList[0])
+counter = 0
+for i in range(0, len(chunksList)):
+    temp2 = np.zeros(shape=(7,1))
+    sub6HypoChunk = temp2
+    temp = np.zeros(shape=(7, numColumns))
+    instance = temp
+    for j in range(0, len(chunksList[i])):
+        # if j==len(chunksList[i])-1:
+        #     print i
+            # print j
+            # print instance
+            # print sub6HypoChunk
+            # print 5*"-"
+        if j<7:
+            instance[j][:] = chunksList[i][j][:]
+            sub6HypoChunk[j][0] = sub6HypoChunkList[i][j][0]
+        else:
+            # for k in range(0, np.size(instance, 0)):
+            #     for l in range(0, 8):
+            subForest.fit(instance, np.ravel(sub6HypoChunk))
+            subForest.n_estimators += 1
+            tempNum = j%7-1
+            instance = np.delete(instance, tempNum, 0)
+            sub6HypoChunk = np.delete(sub6HypoChunk, tempNum, 0)
+            instance = np.vstack((instance, chunksList[i][j][:]))
+            sub6HypoChunk = np.vstack((sub6HypoChunk, sub6HypoChunkList[i][j][0]))
+print "\n"
 print "Subject_6"
-print np.shape(SUB6)
-print np.shape(SUB6HYPO)
-print np.shape(SUB6INDICES)
+# print np.shape(SUB6)
+# print np.shape(SUB6HYPO)
+# print np.shape(SUB6INDICES)
+
+importances = subForest.feature_importances_
+std = np.std([tree.feature_importances_ for tree in subForest.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+for f in range(SUB6.shape[1]):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+print "\n"
 
 SUB9 = np.zeros(shape=(1, 8))
 SUB9HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
@@ -365,8 +438,321 @@ with open('list_9.csv','r') as f:
         	firstLine = False
         else:
         	SUB9INDICES = np.vstack((SUB9INDICES, lineWords))
+templ = []
+chunksList = templ
+sub9HypoChunk = np.zeros(shape=(1,1))
+counter = 0
+tempc = np.zeros(shape=(1, numColumns)) 
+chunks = tempc
+for i in range (0, np.size(SUB9,0)):
+    if counter == 0:
+        sub9HypoChunk[0] = SUB9HYPO[i][:]
+        chunks[0] = SUB9[i][:]
+        counter += 1
+    else:
+        chunks = np.vstack((chunks, SUB9[i][:]))
+        sub9HypoChunk = np.vstack((sub9HypoChunk, SUB9HYPO[i][:]))
+        counter += 1
+    if i != 0:
+        if SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter < 6:
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            counter = 0
+            temp2 = np.zeros(shape=(1,1))
+            sub9HypoChunk = temp2
+        elif SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter >= 6:
+            sub9HypoChunkList.append(sub9HypoChunk)
+            chunksList.append(chunks)
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            temp2 = np.zeros(shape=(1,1))
+            sub9HypoChunk = temp2
+            counter = 0
 
+# print np.shape(chunksList)
+# print len(chunksList)
+# print np.shape(sub9HypoChunkList[0])
+counter = 0
+for i in range(0, len(chunksList)):
+    temp2 = np.zeros(shape=(7,1))
+    sub9HypoChunk = temp2
+    temp = np.zeros(shape=(7, numColumns))
+    instance = temp
+    for j in range(0, len(chunksList[i])):
+        # if j==len(chunksList[i])-1:
+        #     print i
+            # print j
+            # print instance
+            # print sub9HypoChunk
+            # print 5*"-"
+        if j<7:
+            instance[j][:] = chunksList[i][j][:]
+            sub9HypoChunk[j][0] = sub9HypoChunkList[i][j][0]
+        else:
+            # for k in range(0, np.size(instance, 0)):
+            #     for l in range(0, 8):
+            subForest.fit(instance, np.ravel(sub9HypoChunk))
+            subForest.n_estimators += 1
+            tempNum = j%7-1
+            instance = np.delete(instance, tempNum, 0)
+            sub9HypoChunk = np.delete(sub9HypoChunk, tempNum, 0)
+            instance = np.vstack((instance, chunksList[i][j][:]))
+            sub9HypoChunk = np.vstack((sub9HypoChunk, sub9HypoChunkList[i][j][0]))
+print "\n"
 print "Subject_9"
-print np.shape(SUB9)
-print np.shape(SUB9HYPO)
-print np.shape(SUB9INDICES)
+# print np.shape(SUB9)
+# print np.shape(SUB9HYPO)
+# print np.shape(SUB9INDICES)
+
+importances = subForest.feature_importances_
+std = np.std([tree.feature_importances_ for tree in subForest.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+for f in range(SUB9.shape[1]):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+print "\n"
+
+TEST1 = np.zeros(shape=(1, numColumns)) 
+firstLine = True
+with open('sampleinstance_1.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        if firstLine:
+        	TEST1[0] = lineWords
+        	firstLine = False
+        else:
+        	TEST1 = np.vstack((TEST1, lineWords))
+
+print "Sample 1"
+# print np.shape(TEST1)
+print subForest.predict(TEST1)
+print subForest.predict_proba(TEST1)
+print "\n"
+
+TEST2 = np.zeros(shape=(1, numColumns)) 
+firstLine = True
+with open('sampleinstance_2.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        if firstLine:
+        	TEST2[0] = lineWords
+        	firstLine = False
+        else:
+        	TEST2 = np.vstack((TEST2, lineWords))
+
+print "Sample 2"
+# print np.shape(TEST2)
+print subForest.predict(TEST2)
+print subForest.predict_proba(TEST2)
+print "\n"
+
+TEST3 = np.zeros(shape=(1, numColumns)) 
+firstLine = True
+with open('sampleinstance_3.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        if firstLine:
+        	TEST3[0] = lineWords
+        	firstLine = False
+        else:
+        	TEST3 = np.vstack((TEST3, lineWords))
+
+print "Sample 3"
+# print np.shape(TEST3)
+print subForest.predict(TEST3)
+print subForest.predict_proba(TEST3)
+print "\n"
+
+TEST4 = np.zeros(shape=(1, numColumns)) 
+firstLine = True
+with open('sampleinstance_4.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        if firstLine:
+        	TEST4[0] = lineWords
+        	firstLine = False
+        else:
+        	TEST4 = np.vstack((TEST4, lineWords))
+
+print "Sample 4"
+# print np.shape(TEST4)
+print subForest.predict(TEST4)
+print subForest.predict_proba(TEST4)
+print "\n"
+
+TEST5 = np.zeros(shape=(1, numColumns)) 
+firstLine = True
+with open('sampleinstance_5.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        if firstLine:
+        	TEST5[0] = lineWords
+        	firstLine = False
+        else:
+        	TEST5 = np.vstack((TEST5, lineWords))
+
+print "Sample 5"
+# print np.shape(TEST5)
+print subForest.predict(TEST5)
+print subForest.predict_proba(TEST5)
+print "\n"
+
+# Below is if we want to use subject 2 part 1 as a verifier instead of sample instances
+# SUB2 = np.zeros(shape=(1, 8))
+# SUB2HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
+# SUB2INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 9
+
+# firstLine = True
+# with open('Subject_2_part1.csv','r') as f:
+#     for line in f:
+#         featureNum = 0
+#         lineWords = []
+#         averageValue = []
+#         for word in line.split(','):
+#             if featureNum > 0 and featureNum < 9:
+#            	  lineWords.append(float(word))
+#            	  featureNum += 1
+#             elif featureNum == 9:
+#            	  averageValue.append(float(word))
+#             else:
+#               featureNum += 1
+#             # print lineWords
+
+#         if firstLine:
+#         	SUB2[0] = lineWords
+#         	SUB2HYPO[0] = averageValue
+#         	firstLine = False
+#         else:
+#         	SUB2 = np.vstack((SUB2, lineWords))
+#         	SUB2HYPO = np.vstack((SUB2HYPO, averageValue))
+
+# firstLine = True
+# with open('list2_part1.csv','r') as f:
+#     for line in f:
+#     	lineWords = []
+#         for word in line.split(','):
+#         	lineWords.append(int(word))
+
+#         if firstLine:
+#         	SUB2INDICES[0] = lineWords
+#         	firstLine = False
+#         else:
+#         	SUB2INDICES = np.vstack((SUB2INDICES, lineWords))
+
+# templ = []
+# chunksList = templ
+# sub2HypoChunk = np.zeros(shape=(1,1))
+# counter = 0
+# tempc = np.zeros(shape=(1, numColumns)) 
+# chunks = tempc
+# for i in range (0, np.size(SUB2,0)):
+#     if counter == 0:
+#         sub2HypoChunk[0] = SUB2HYPO[i][:]
+#         chunks[0] = SUB2[i][:]
+#         counter += 1
+#     else:
+#         chunks = np.vstack((chunks, SUB2[i][:]))
+#         sub2HypoChunk = np.vstack((sub2HypoChunk, SUB2HYPO[i][:]))
+#         counter += 1
+#     if i != 0:
+#         if SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter < 6:
+#             temp = np.zeros(shape=(1, numColumns))
+#             chunks = temp
+#             counter = 0
+#             temp2 = np.zeros(shape=(1,1))
+#             sub2HypoChunk = temp2
+#         elif SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter >= 6:
+#             sub2HypoChunkList.append(sub2HypoChunk)
+#             chunksList.append(chunks)
+#             temp = np.zeros(shape=(1, numColumns))
+#             chunks = temp
+#             temp2 = np.zeros(shape=(1,1))
+#             sub2HypoChunk = temp2
+#             counter = 0
+# print "Subject 2"
+# counter = 0
+# for i in range(0, len(chunksList)):
+#     temp2 = np.zeros(shape=(7,1))
+#     sub2HypoChunk = temp2
+#     temp = np.zeros(shape=(7, numColumns))
+#     instance = temp
+#     for j in range(0, len(chunksList[i])):
+#         # if j==len(chunksList[i])-1:
+#         #     print i
+#             # print j
+#             # print instance
+#             # print sub9HypoChunk
+#             # print 5*"-"
+#         if j<7:
+#             instance[j][:] = chunksList[i][j][:]
+#             sub2HypoChunk[j][0] = sub2HypoChunkList[i][j][0]
+#         else:
+#             # for k in range(0, np.size(instance, 0)):
+#             #     for l in range(0, 8):
+#             if counter < 17:
+# 	            print subForest.predict(instance)
+# 	            print sub2HypoChunk
+# 	            print subForest.predict_proba(instance)
+#             # print subForest.predict_proba(instance)
+#             # subForest.fit(instance, np.ravel(sub2HypoChunk))
+#             # subForest.n_estimators += 1
+#             tempNum = j%7-1
+#             instance = np.delete(instance, tempNum, 0)
+#             sub2HypoChunk = np.delete(sub2HypoChunk, tempNum, 0)
+#             instance = np.vstack((instance, chunksList[i][j][:]))
+#             sub2HypoChunk = np.vstack((sub2HypoChunk, sub2HypoChunkList[i][j][0]))
+
+# print "Subject 2"
+# print np.shape(SUB2)
+# print np.shape(SUB2HYPO)
+# print np.shape(SUB2INDICES)

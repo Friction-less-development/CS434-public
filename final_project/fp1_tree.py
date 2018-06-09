@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn.metrics import auc, roc_auc_score
+from sklearn.metrics import auc, roc_curve, roc_auc_score
 #How to Run: python fp1_tree.py
 #Purpose of program: Final project for General Population Model Test using decision tree as our model 
 
 # Sources: 
 #           http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 #           https://stackoverflow.com/questions/42757892/how-to-use-warm-start
+#			https://stackoverflow.com/questions/31159157/different-result-with-roc-auc-score-and-auc
 
 numColumns = 8
 instance = np.zeros(shape=(7, numColumns))
@@ -94,9 +95,6 @@ for i in range (0, np.size(SUB1,0)):
             sub1HypoChunk = temp2
             counter = 0
 
-# print np.shape(chunksList)
-# print len(chunksList)
-# print np.shape(sub1HypoChunkList[0])
 counter = 0
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
@@ -124,11 +122,6 @@ for i in range(0, len(chunksList)):
             instance = np.vstack((instance, chunksList[i][j][:]))
             sub1HypoChunk = np.vstack((sub1HypoChunk, int(sub1HypoChunkList[i][j][0])))
 
-# print sub1HypoChunkList[0][349]
-# print sub1HypoChunkList[0][348]
-# print np.shape(sub1HypoChunkList)
-# print np.shape(instance)
-# print np.shape(chunks)
 print "\n"
 print "Subject_1"
 # print np.shape(SUB1)
@@ -144,13 +137,6 @@ indices = np.argsort(importances)[::-1]
 for f in range(SUB1.shape[1]):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 print "\n"
-# plt.figure()
-# plt.title("Feature importances")
-# plt.bar(range(SUB1.shape[1]), importances[indices],
-#        color="r", yerr=std[indices], align="center")
-# plt.xticks(range(SUB1.shape[1]), indices)
-# plt.xlim([-1, SUB1.shape[1]])
-# plt.savefig('FeatureImportanceSub1.png') # after 1 subject
 
 
 
@@ -228,9 +214,6 @@ for i in range (0, np.size(SUB4,0)):
             sub4HypoChunk = temp2
             counter = 0
 
-# print np.shape(chunksList)
-# print len(chunksList)
-# print np.shape(sub4HypoChunkList[0])
 counter = 0
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
@@ -272,13 +255,6 @@ indices = np.argsort(importances)[::-1]
 for f in range(SUB4.shape[1]):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 print "\n"
-# plt.figure()
-# plt.title("Feature importances")
-# plt.bar(range(SUB4.shape[1]), importances[indices],
-#        color="r", yerr=std[indices], align="center")
-# plt.xticks(range(SUB4.shape[1]), indices)
-# plt.xlim([-1, SUB4.shape[1]])
-# plt.savefig('FeatureImportanceSub2.png') # after 2 subjects
 
 SUB6 = np.zeros(shape=(1, 8))
 SUB6HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
@@ -353,9 +329,6 @@ for i in range (0, np.size(SUB6,0)):
             sub6HypoChunk = temp2
             counter = 0
 
-# print np.shape(chunksList)
-# print len(chunksList)
-# print np.shape(sub6HypoChunkList[0])
 counter = 0
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
@@ -469,9 +442,6 @@ for i in range (0, np.size(SUB9,0)):
             sub9HypoChunk = temp2
             counter = 0
 
-# print np.shape(chunksList)
-# print len(chunksList)
-# print np.shape(sub9HypoChunkList[0])
 counter = 0
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
@@ -536,7 +506,7 @@ with open('sampleinstance_1.csv','r') as f:
 print "Sample 1"
 # print np.shape(TEST1)
 print subForest.predict(TEST1)
-print subForest.predict_proba(TEST1)
+# print subForest.predict_proba(TEST1)
 print "\n"
 
 TEST2 = np.zeros(shape=(1, numColumns)) 
@@ -563,7 +533,7 @@ with open('sampleinstance_2.csv','r') as f:
 print "Sample 2"
 # print np.shape(TEST2)
 print subForest.predict(TEST2)
-print subForest.predict_proba(TEST2)
+# print subForest.predict_proba(TEST2)
 print "\n"
 
 TEST3 = np.zeros(shape=(1, numColumns)) 
@@ -590,7 +560,7 @@ with open('sampleinstance_3.csv','r') as f:
 print "Sample 3"
 # print np.shape(TEST3)
 print subForest.predict(TEST3)
-print subForest.predict_proba(TEST3)
+# print subForest.predict_proba(TEST3)
 print "\n"
 
 TEST4 = np.zeros(shape=(1, numColumns)) 
@@ -617,7 +587,7 @@ with open('sampleinstance_4.csv','r') as f:
 print "Sample 4"
 # print np.shape(TEST4)
 print subForest.predict(TEST4)
-print subForest.predict_proba(TEST4)
+# print subForest.predict_proba(TEST4)
 print "\n"
 
 TEST5 = np.zeros(shape=(1, numColumns)) 
@@ -644,7 +614,7 @@ with open('sampleinstance_5.csv','r') as f:
 print "Sample 5"
 # print np.shape(TEST5)
 print subForest.predict(TEST5)
-print subForest.predict_proba(TEST5)
+# print subForest.predict_proba(TEST5)
 print "\n"
 
 # Below is if we want to use subject 2 part 1 as a verifier instead of sample instances
@@ -731,6 +701,7 @@ falseP = 0 # false positives
 falseN = 0 # false negatives
 correctP = 1 # correct positives aka correct when hypo event will happen
 correctN = 4 # correct negatives aka correct when there isn't a hypo event
+numInstances = 295 # number of instances from Subject 2 to run, 295 takes quite a while to run
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
     sub2HypoChunk = temp2
@@ -749,7 +720,7 @@ for i in range(0, len(chunksList)):
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
-			if counter < 9:
+			if counter < numInstances:
 				isRight = False
 				oneExists = False
 				predictForest = subForest.predict(instance)
@@ -759,7 +730,7 @@ for i in range(0, len(chunksList)):
 				if oneExists:
 					y.append(1)
 					for k in range(0, len(predictForest)):
-						if predictForest[k] > 0:
+						if predictForest[k] > 0.5:
 							isRight = True
 					if isRight:
 						X.append(1)
@@ -769,7 +740,7 @@ for i in range(0, len(chunksList)):
 					y.append(0)
 					isRight = True
 					for k in range(0, len(predictForest)):
-						if predictForest[k] > 0.:
+						if predictForest[k] > 0.5:
 							isRight = False
 					if isRight:
 						X.append(0)
@@ -789,7 +760,7 @@ for i in range(0, len(chunksList)):
 				print predictForest
 				print sub2HypoChunk
 				print "Correct: ", isRight
-				print subForest.predict_proba(instance)
+				# print subForest.predict_proba(instance)
 				numTotal += 1
 				print "\n"
 			tempNum = j%7-1
@@ -804,9 +775,34 @@ print "correct positives: ", correctP # a
 print "false negatives: ", falseN # b
 print "false positives: ", falseP # c
 print "correct negatives: ", correctN # d
+precisionP = correctP/float((correctP+falseP))
+recallR = correctP/float((correctP+falseN))
+fMeasure = (2*precisionP*recallR)/float((recallR+precisionP))
+wAccuracy = (correctP+correctN)/float((correctP+falseN+falseP+correctN))
+print "Precision: ", precisionP
+print "Recall: ", recallR
+print "F-measure: ", fMeasure
+print "Accuracy: ", wAccuracy
 # tpRate = correctP/(correctP+falseN) # true positive rate
 # fpRate = falseP/(falseP + correctN) # false positive rate
 # print y
 # print X
-print "Area under ROC: ", roc_auc_score(y, X)
+# fp_rate, tp_rate, thresholds = roc_curve(y, X)
+# print fp_rate
+# print tp_rate
+# print thresholds
+# print "Auc: ", auc(fp_rate, tp_rate)
+rocScore = roc_auc_score(y, X)
+print "Area under ROC: ", rocScore
 print "total: ", numTotal
+# f = open('gold.csv','w')
+# for i in range(0, len(y)):
+# 	stringVar = str(y[i]) + "\n"
+# 	f.write(stringVar)
+# f.close()
+
+# f2 = open('pred.csv', 'w')
+# for i in range(0, len(X)):
+# 	stringVar = str(rocScore) + "," + str(X[i]) + "\n"
+# 	f2.write(stringVar)
+# f2.close()

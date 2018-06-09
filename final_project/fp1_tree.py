@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import auc, roc_auc_score
 #How to Run: python fp1_tree.py
 #Purpose of program: Final project for General Population Model Test using decision tree as our model 
 
@@ -722,7 +722,15 @@ for i in range (0, np.size(SUB2,0)):
 print "Subject 2"
 counter = 0
 numberCorrect = 5
+y = [0, 0, 0, 1, 0] # actual
+X = [0, 0, 0, 1, 0] # predicted
+# y = [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+# X = [0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
 numTotal = 5
+falseP = 0 # false positives
+falseN = 0 # false negatives
+correctP = 1 # correct positives aka correct when hypo event will happen
+correctN = 4 # correct negatives aka correct when there isn't a hypo event
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
     sub2HypoChunk = temp2
@@ -749,16 +757,35 @@ for i in range(0, len(chunksList)):
 					if sub2HypoChunk[k][0] > 0.5:
 						oneExists = True
 				if oneExists:
+					y.append(1)
 					for k in range(0, len(predictForest)):
 						if predictForest[k] > 0:
 							isRight = True
+					if isRight:
+						X.append(1)
+					else:
+						X.append(0)
 				else:
+					y.append(0)
 					isRight = True
 					for k in range(0, len(predictForest)):
 						if predictForest[k] > 0.:
 							isRight = False
+					if isRight:
+						X.append(0)
+					else:
+						X.append(1)
 				if isRight:
-						numberCorrect += 1
+					numberCorrect += 1
+					if oneExists:
+						correctP += 1
+					else:
+						correctN += 1
+				else:
+					if oneExists:
+						falseN += 1
+					else:
+						falseP += 1
 				print predictForest
 				print sub2HypoChunk
 				print "Correct: ", isRight
@@ -771,5 +798,15 @@ for i in range(0, len(chunksList)):
 			instance = np.vstack((instance, chunksList[i][j][:]))
 			sub2HypoChunk = np.vstack((sub2HypoChunk, sub2HypoChunkList[i][j][0]))
 			counter += 1
+
 print "number correct: ", numberCorrect
+print "correct positives: ", correctP # a
+print "false negatives: ", falseN # b
+print "false positives: ", falseP # c
+print "correct negatives: ", correctN # d
+# tpRate = correctP/(correctP+falseN) # true positive rate
+# fpRate = falseP/(falseP + correctN) # false positive rate
+# print y
+# print X
+print "Area under ROC: ", roc_auc_score(y, X)
 print "total: ", numTotal

@@ -417,6 +417,7 @@ sub9HypoChunk = np.zeros(shape=(1,1))
 counter = 0
 tempc = np.zeros(shape=(1, numColumns)) 
 chunks = tempc
+xAccuracy = [] # store accuracies for our predictions
 for i in range (0, np.size(SUB9,0)):
     if counter == 0:
         sub9HypoChunk[0] = SUB9HYPO[i][:]
@@ -506,6 +507,8 @@ with open('sampleinstance_1.csv','r') as f:
 print "Sample 1"
 # print np.shape(TEST1)
 print subForest.predict(TEST1)
+sampleInstProb = subForest.predict_proba(TEST1)
+xAccuracy.append(np.amax(sampleInstProb))
 # print subForest.predict_proba(TEST1)
 print "\n"
 
@@ -533,6 +536,8 @@ with open('sampleinstance_2.csv','r') as f:
 print "Sample 2"
 # print np.shape(TEST2)
 print subForest.predict(TEST2)
+sampleInstProb = subForest.predict_proba(TEST2)
+xAccuracy.append(np.amax(sampleInstProb))
 # print subForest.predict_proba(TEST2)
 print "\n"
 
@@ -560,6 +565,8 @@ with open('sampleinstance_3.csv','r') as f:
 print "Sample 3"
 # print np.shape(TEST3)
 print subForest.predict(TEST3)
+sampleInstProb = subForest.predict_proba(TEST3)
+xAccuracy.append(np.amax(sampleInstProb))
 # print subForest.predict_proba(TEST3)
 print "\n"
 
@@ -587,6 +594,8 @@ with open('sampleinstance_4.csv','r') as f:
 print "Sample 4"
 # print np.shape(TEST4)
 print subForest.predict(TEST4)
+sampleInstProb = subForest.predict_proba(TEST4)
+xAccuracy.append(np.amax(sampleInstProb))
 # print subForest.predict_proba(TEST4)
 print "\n"
 
@@ -614,6 +623,8 @@ with open('sampleinstance_5.csv','r') as f:
 print "Sample 5"
 # print np.shape(TEST5)
 print subForest.predict(TEST5)
+sampleInstProb = subForest.predict_proba(TEST5)
+xAccuracy.append(np.amax(sampleInstProb))
 # print subForest.predict_proba(TEST5)
 print "\n"
 
@@ -701,7 +712,7 @@ falseP = 0 # false positives
 falseN = 0 # false negatives
 correctP = 1 # correct positives aka correct when hypo event will happen
 correctN = 4 # correct negatives aka correct when there isn't a hypo event
-numInstances = 295 # number of instances from Subject 2 to run, 295 takes quite a while to run
+numInstances = 95 # number of instances from Subject 2 to run, 295 takes quite a while to run
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
     sub2HypoChunk = temp2
@@ -724,6 +735,8 @@ for i in range(0, len(chunksList)):
 				isRight = False
 				oneExists = False
 				predictForest = subForest.predict(instance)
+				predictForestProb = subForest.predict_proba(instance)
+				xAccuracy.append(np.amax(predictForestProb))
 				for k in range(0, 7):
 					if sub2HypoChunk[k][0] > 0.5:
 						oneExists = True
@@ -795,14 +808,38 @@ print "Accuracy: ", wAccuracy
 rocScore = roc_auc_score(y, X)
 print "Area under ROC: ", rocScore
 print "total: ", numTotal
-# f = open('gold.csv','w')
-# for i in range(0, len(y)):
-# 	stringVar = str(y[i]) + "\n"
-# 	f.write(stringVar)
-# f.close()
+f = open('runOutput.txt', 'w')
+tempStr = "number correct: " + str(numberCorrect) + "\n"
+f.write(tempStr)
+tempStr = "correct positives: " + str(correctP) + "\n"
+f.write(tempStr)
+tempStr = "false negatives: " + str(falseN) + "\n"
+f.write(tempStr)
+tempStr = "false positives: " + str(falseP) + "\n"
+f.write(tempStr)
+tempStr = "correct negatives: " + str(correctN) + "\n"
+f.write(tempStr)
+tempStr = "Precision: " + str(precisionP) + "\n"
+f.write(tempStr)
+tempStr = "Recall: " + str(recallR) + "\n"
+f.write(tempStr)
+tempStr = "F-measure: " + str(fMeasure) + "\n"
+f.write(tempStr)
+tempStr = "Accuracy: " + str(wAccuracy) + "\n"
+f.write(tempStr)
+tempStr = "Area under ROC: " + str(rocScore) + "\n"
+f.write(tempStr)
+tempStr = "total: " + str(numTotal) + "\n"
+f.write(tempStr)
+f.close()
+f = open('gold.csv','w')
+for i in range(0, len(y)):
+	stringVar = str(y[i]) + "\n"
+	f.write(stringVar)
+f.close()
 
-# f2 = open('pred.csv', 'w')
-# for i in range(0, len(X)):
-# 	stringVar = str(rocScore) + "," + str(X[i]) + "\n"
-# 	f2.write(stringVar)
-# f2.close()
+f2 = open('pred.csv', 'w')
+for i in range(0, len(X)):
+	stringVar = str(xAccuracy[i]) + "," + str(X[i]) + "\n"
+	f2.write(stringVar)
+f2.close()

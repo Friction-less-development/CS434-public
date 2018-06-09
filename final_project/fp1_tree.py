@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils.class_weight import compute_class_weight
-
+from sklearn.metrics import roc_auc_score
 #How to Run: python fp1_tree.py
 #Purpose of program: Final project for General Population Model Test using decision tree as our model 
 
@@ -64,9 +64,9 @@ with open('list_1.csv','r') as f:
         	SUB1INDICES = np.vstack((SUB1INDICES, lineWords))
 classWeights = compute_class_weight("balanced", [0., 1.], np.ravel(SUB1HYPO))
 # print classWeights
-# classWeights[0] = classWeights[0]/126. # can only put class weight of 0 in, so divide it by the wiehgt of class weight of 1, more or less.
+classWeights[0] = classWeights[0]/126. # can only put class weight of 0 in, so divide it by the wiehgt of class weight of 1, more or less.
 counter = 0 # must get to at least equaling 6, which is a minimum of 7 instances for a 30 minute period
-subForest = RandomForestClassifier(criterion="entropy", max_depth=5, random_state=0, warm_start=True, bootstrap=False, class_weight={0.:classWeights[0]}) # class_weight={0.:classWeights[0]}
+subForest = RandomForestClassifier(criterion="entropy", max_depth=7, max_features=6, random_state=0, warm_start=True, bootstrap=False, class_weight={0.:classWeights[0]}) # class_weight={0.:classWeights[0]}
 
 sub1HypoChunk = np.zeros(shape=(1,1))
 for i in range (0, np.size(SUB1,0)):

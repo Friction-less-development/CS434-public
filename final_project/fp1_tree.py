@@ -71,29 +71,35 @@ subForest = RandomForestClassifier(criterion="entropy", max_depth=7, max_feature
 
 sub1HypoChunk = np.zeros(shape=(1,1))
 for i in range (0, np.size(SUB1,0)):
-    if counter == 0:
-        sub1HypoChunk[0] = SUB1HYPO[i][:]
-        chunks[0] = SUB1[i][:]
-        counter += 1
-    else:
-        chunks = np.vstack((chunks, SUB1[i][:]))
-        sub1HypoChunk = np.vstack((sub1HypoChunk, SUB1HYPO[i][:]))
-        counter += 1
-    if i != 0:
-        if SUB1INDICES[i][0] - 1 != SUB1INDICES[i-1][0] and counter < 6:
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            counter = 0
-            temp2 = np.zeros(shape=(1,1))
-            sub1HypoChunk = temp2
-        elif SUB1INDICES[i][0] - 1 != SUB1INDICES[i-1][0] and counter >= 6:
-            sub1HypoChunkList.append(sub1HypoChunk)
-            chunksList.append(chunks)
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            temp2 = np.zeros(shape=(1,1))
-            sub1HypoChunk = temp2
-            counter = 0
+	if counter == 0:
+	    sub1HypoChunk[0] = SUB1HYPO[i][:]
+	    chunks[0] = SUB1[i][:]
+	    counter += 1
+	else:
+	    chunks = np.vstack((chunks, SUB1[i][:]))
+	    sub1HypoChunk = np.vstack((sub1HypoChunk, SUB1HYPO[i][:]))
+	    counter += 1
+	if i != 0:
+		if SUB1INDICES[i][0] - 1 != SUB1INDICES[i-1][0] and counter < 6:
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    counter = 0
+		    temp2 = np.zeros(shape=(1,1))
+		    sub1HypoChunk = temp2
+		elif SUB1INDICES[i][0] - 1 != SUB1INDICES[i-1][0] and counter >= 6:
+		    sub1HypoChunkList.append(sub1HypoChunk)
+		    chunksList.append(chunks)
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    temp2 = np.zeros(shape=(1,1))
+		    sub1HypoChunk = temp2
+		    counter = 0
+	else:
+		if SUB1INDICES[i][0] + 1 != SUB1INDICES[i+1][0]:
+			temp = np.zeros(shape=(1, numColumns))
+			chunks = temp
+			counter = 0
+			temp2 = np.zeros(shape=(1,1))
 
 counter = 0
 for i in range(0, len(chunksList)):
@@ -190,29 +196,35 @@ counter = 0
 tempc = np.zeros(shape=(1, numColumns)) 
 chunks = tempc
 for i in range (0, np.size(SUB4,0)):
-    if counter == 0:
-        sub4HypoChunk[0] = SUB4HYPO[i][:]
-        chunks[0] = SUB4[i][:]
-        counter += 1
-    else:
-        chunks = np.vstack((chunks, SUB4[i][:]))
-        sub4HypoChunk = np.vstack((sub4HypoChunk, SUB4HYPO[i][:]))
-        counter += 1
-    if i != 0:
-        if SUB4INDICES[i][0] - 1 != SUB4INDICES[i-1][0] and counter < 6:
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            counter = 0
-            temp2 = np.zeros(shape=(1,1))
-            sub4HypoChunk = temp2
-        elif SUB4INDICES[i][0] - 1 != SUB4INDICES[i-1][0] and counter >= 6:
-            sub4HypoChunkList.append(sub4HypoChunk)
-            chunksList.append(chunks)
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            temp2 = np.zeros(shape=(1,1))
-            sub4HypoChunk = temp2
-            counter = 0
+	if counter == 0:
+	    sub4HypoChunk[0] = SUB4HYPO[i][:]
+	    chunks[0] = SUB4[i][:]
+	    counter += 1
+	else:
+	    chunks = np.vstack((chunks, SUB4[i][:]))
+	    sub4HypoChunk = np.vstack((sub4HypoChunk, SUB4HYPO[i][:]))
+	    counter += 1
+	if i != 0:
+		if SUB4INDICES[i][0] - 1 != SUB4INDICES[i-1][0] and counter < 6:
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    counter = 0
+		    temp2 = np.zeros(shape=(1,1))
+		    sub4HypoChunk = temp2
+		elif SUB4INDICES[i][0] - 1 != SUB4INDICES[i-1][0] and counter >= 6:
+		    sub4HypoChunkList.append(sub4HypoChunk)
+		    chunksList.append(chunks)
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    temp2 = np.zeros(shape=(1,1))
+		    sub4HypoChunk = temp2
+		    counter = 0
+	else:
+		if SUB4INDICES[i][0] + 1 != SUB4INDICES[i+1][0]:
+			temp = np.zeros(shape=(1, numColumns))
+			chunks = temp
+			counter = 0
+			temp2 = np.zeros(shape=(1,1))
 
 counter = 0
 for i in range(0, len(chunksList)):
@@ -305,29 +317,35 @@ counter = 0
 tempc = np.zeros(shape=(1, numColumns)) 
 chunks = tempc
 for i in range (0, np.size(SUB6,0)):
-    if counter == 0:
-        sub6HypoChunk[0] = SUB6HYPO[i][:]
-        chunks[0] = SUB6[i][:]
-        counter += 1
-    else:
-        chunks = np.vstack((chunks, SUB6[i][:]))
-        sub6HypoChunk = np.vstack((sub6HypoChunk, SUB6HYPO[i][:]))
-        counter += 1
-    if i != 0:
-        if SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter < 6:
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            counter = 0
-            temp2 = np.zeros(shape=(1,1))
-            sub6HypoChunk = temp2
-        elif SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter >= 6:
-            sub6HypoChunkList.append(sub6HypoChunk)
-            chunksList.append(chunks)
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            temp2 = np.zeros(shape=(1,1))
-            sub6HypoChunk = temp2
-            counter = 0
+	if counter == 0:
+	    sub6HypoChunk[0] = SUB6HYPO[i][:]
+	    chunks[0] = SUB6[i][:]
+	    counter += 1
+	else:
+	    chunks = np.vstack((chunks, SUB6[i][:]))
+	    sub6HypoChunk = np.vstack((sub6HypoChunk, SUB6HYPO[i][:]))
+	    counter += 1
+	if i != 0:
+		if SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter < 6:
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    counter = 0
+		    temp2 = np.zeros(shape=(1,1))
+		    sub6HypoChunk = temp2
+		elif SUB6INDICES[i][0] - 1 != SUB6INDICES[i-1][0] and counter >= 6:
+		    sub6HypoChunkList.append(sub6HypoChunk)
+		    chunksList.append(chunks)
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    temp2 = np.zeros(shape=(1,1))
+		    sub6HypoChunk = temp2
+		    counter = 0
+	else:
+		if SUB6INDICES[i][0] + 1 != SUB6INDICES[i+1][0]:
+			temp = np.zeros(shape=(1, numColumns))
+			chunks = temp
+			counter = 0
+			temp2 = np.zeros(shape=(1,1))
 
 counter = 0
 for i in range(0, len(chunksList)):
@@ -419,29 +437,35 @@ tempc = np.zeros(shape=(1, numColumns))
 chunks = tempc
 xAccuracy = [] # store accuracies for our predictions
 for i in range (0, np.size(SUB9,0)):
-    if counter == 0:
-        sub9HypoChunk[0] = SUB9HYPO[i][:]
-        chunks[0] = SUB9[i][:]
-        counter += 1
-    else:
-        chunks = np.vstack((chunks, SUB9[i][:]))
-        sub9HypoChunk = np.vstack((sub9HypoChunk, SUB9HYPO[i][:]))
-        counter += 1
-    if i != 0:
-        if SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter < 6:
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            counter = 0
-            temp2 = np.zeros(shape=(1,1))
-            sub9HypoChunk = temp2
-        elif SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter >= 6:
-            sub9HypoChunkList.append(sub9HypoChunk)
-            chunksList.append(chunks)
-            temp = np.zeros(shape=(1, numColumns))
-            chunks = temp
-            temp2 = np.zeros(shape=(1,1))
-            sub9HypoChunk = temp2
-            counter = 0
+	if counter == 0:
+	    sub9HypoChunk[0] = SUB9HYPO[i][:]
+	    chunks[0] = SUB9[i][:]
+	    counter += 1
+	else:
+	    chunks = np.vstack((chunks, SUB9[i][:]))
+	    sub9HypoChunk = np.vstack((sub9HypoChunk, SUB9HYPO[i][:]))
+	    counter += 1
+	if i != 0:
+		if SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter < 6:
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    counter = 0
+		    temp2 = np.zeros(shape=(1,1))
+		    sub9HypoChunk = temp2
+		elif SUB9INDICES[i][0] - 1 != SUB9INDICES[i-1][0] and counter >= 6:
+		    sub9HypoChunkList.append(sub9HypoChunk)
+		    chunksList.append(chunks)
+		    temp = np.zeros(shape=(1, numColumns))
+		    chunks = temp
+		    temp2 = np.zeros(shape=(1,1))
+		    sub9HypoChunk = temp2
+		    counter = 0
+	else:
+		if SUB9INDICES[i][0] + 1 != SUB9INDICES[i+1][0]:
+			temp = np.zeros(shape=(1, numColumns))
+			chunks = temp
+			counter = 0
+			temp2 = np.zeros(shape=(1,1))
 
 counter = 0
 for i in range(0, len(chunksList)):
@@ -712,7 +736,7 @@ falseP = 0 # false positives
 falseN = 0 # false negatives
 correctP = 1 # correct positives aka correct when hypo event will happen
 correctN = 4 # correct negatives aka correct when there isn't a hypo event
-numInstances = 95 # number of instances from Subject 2 to run, 295 takes quite a while to run
+numInstances = 5 # number of instances from Subject 2 to run, 295 takes quite a while to run
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
     sub2HypoChunk = temp2

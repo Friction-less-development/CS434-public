@@ -648,111 +648,128 @@ print subForest.predict_proba(TEST5)
 print "\n"
 
 # Below is if we want to use subject 2 part 1 as a verifier instead of sample instances
-# SUB2 = np.zeros(shape=(1, 8))
-# SUB2HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
-# SUB2INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 9
+SUB2 = np.zeros(shape=(1, 8))
+SUB2HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
+SUB2INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 9
 
-# firstLine = True
-# with open('Subject_2_part1.csv','r') as f:
-#     for line in f:
-#         featureNum = 0
-#         lineWords = []
-#         averageValue = []
-#         for word in line.split(','):
-#             if featureNum > 0 and featureNum < 9:
-#            	  lineWords.append(float(word))
-#            	  featureNum += 1
-#             elif featureNum == 9:
-#            	  averageValue.append(float(word))
-#             else:
-#               featureNum += 1
-#             # print lineWords
+firstLine = True
+with open('Subject_2_part1.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 0 and featureNum < 9:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            elif featureNum == 9:
+           	  averageValue.append(float(word))
+            else:
+              featureNum += 1
+            # print lineWords
 
-#         if firstLine:
-#         	SUB2[0] = lineWords
-#         	SUB2HYPO[0] = averageValue
-#         	firstLine = False
-#         else:
-#         	SUB2 = np.vstack((SUB2, lineWords))
-#         	SUB2HYPO = np.vstack((SUB2HYPO, averageValue))
+        if firstLine:
+        	SUB2[0] = lineWords
+        	SUB2HYPO[0] = averageValue
+        	firstLine = False
+        else:
+        	SUB2 = np.vstack((SUB2, lineWords))
+        	SUB2HYPO = np.vstack((SUB2HYPO, averageValue))
 
-# firstLine = True
-# with open('list2_part1.csv','r') as f:
-#     for line in f:
-#     	lineWords = []
-#         for word in line.split(','):
-#         	lineWords.append(int(word))
+firstLine = True
+with open('list2_part1.csv','r') as f:
+    for line in f:
+    	lineWords = []
+        for word in line.split(','):
+        	lineWords.append(int(word))
 
-#         if firstLine:
-#         	SUB2INDICES[0] = lineWords
-#         	firstLine = False
-#         else:
-#         	SUB2INDICES = np.vstack((SUB2INDICES, lineWords))
+        if firstLine:
+        	SUB2INDICES[0] = lineWords
+        	firstLine = False
+        else:
+        	SUB2INDICES = np.vstack((SUB2INDICES, lineWords))
 
-# templ = []
-# chunksList = templ
-# sub2HypoChunk = np.zeros(shape=(1,1))
-# counter = 0
-# tempc = np.zeros(shape=(1, numColumns)) 
-# chunks = tempc
-# for i in range (0, np.size(SUB2,0)):
-#     if counter == 0:
-#         sub2HypoChunk[0] = SUB2HYPO[i][:]
-#         chunks[0] = SUB2[i][:]
-#         counter += 1
-#     else:
-#         chunks = np.vstack((chunks, SUB2[i][:]))
-#         sub2HypoChunk = np.vstack((sub2HypoChunk, SUB2HYPO[i][:]))
-#         counter += 1
-#     if i != 0:
-#         if SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter < 6:
-#             temp = np.zeros(shape=(1, numColumns))
-#             chunks = temp
-#             counter = 0
-#             temp2 = np.zeros(shape=(1,1))
-#             sub2HypoChunk = temp2
-#         elif SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter >= 6:
-#             sub2HypoChunkList.append(sub2HypoChunk)
-#             chunksList.append(chunks)
-#             temp = np.zeros(shape=(1, numColumns))
-#             chunks = temp
-#             temp2 = np.zeros(shape=(1,1))
-#             sub2HypoChunk = temp2
-#             counter = 0
-# print "Subject 2"
-# counter = 0
-# for i in range(0, len(chunksList)):
-#     temp2 = np.zeros(shape=(7,1))
-#     sub2HypoChunk = temp2
-#     temp = np.zeros(shape=(7, numColumns))
-#     instance = temp
-#     for j in range(0, len(chunksList[i])):
-#         # if j==len(chunksList[i])-1:
-#         #     print i
-#             # print j
-#             # print instance
-#             # print sub9HypoChunk
-#             # print 5*"-"
-#         if j<7:
-#             instance[j][:] = chunksList[i][j][:]
-#             sub2HypoChunk[j][0] = sub2HypoChunkList[i][j][0]
-#         else:
-#             # for k in range(0, np.size(instance, 0)):
-#             #     for l in range(0, 8):
-#             if counter < 17:
-# 	            print subForest.predict(instance)
-# 	            print sub2HypoChunk
-# 	            print subForest.predict_proba(instance)
-#             # print subForest.predict_proba(instance)
-#             # subForest.fit(instance, np.ravel(sub2HypoChunk))
-#             # subForest.n_estimators += 1
-#             tempNum = j%7-1
-#             instance = np.delete(instance, tempNum, 0)
-#             sub2HypoChunk = np.delete(sub2HypoChunk, tempNum, 0)
-#             instance = np.vstack((instance, chunksList[i][j][:]))
-#             sub2HypoChunk = np.vstack((sub2HypoChunk, sub2HypoChunkList[i][j][0]))
-
-# print "Subject 2"
-# print np.shape(SUB2)
-# print np.shape(SUB2HYPO)
-# print np.shape(SUB2INDICES)
+templ = []
+chunksList = templ
+sub2HypoChunk = np.zeros(shape=(1,1))
+counter = 0
+tempc = np.zeros(shape=(1, numColumns)) 
+chunks = tempc
+for i in range (0, np.size(SUB2,0)):
+    if counter == 0:
+        sub2HypoChunk[0] = SUB2HYPO[i][:]
+        chunks[0] = SUB2[i][:]
+        counter += 1
+    else:
+        chunks = np.vstack((chunks, SUB2[i][:]))
+        sub2HypoChunk = np.vstack((sub2HypoChunk, SUB2HYPO[i][:]))
+        counter += 1
+    if i != 0:
+        if SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter < 6:
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            counter = 0
+            temp2 = np.zeros(shape=(1,1))
+            sub2HypoChunk = temp2
+        elif SUB2INDICES[i][0] - 1 != SUB2INDICES[i-1][0] and counter >= 6:
+            sub2HypoChunkList.append(sub2HypoChunk)
+            chunksList.append(chunks)
+            temp = np.zeros(shape=(1, numColumns))
+            chunks = temp
+            temp2 = np.zeros(shape=(1,1))
+            sub2HypoChunk = temp2
+            counter = 0
+print "Subject 2"
+counter = 0
+numberCorrect = 5
+numTotal = 5
+for i in range(0, len(chunksList)):
+    temp2 = np.zeros(shape=(7,1))
+    sub2HypoChunk = temp2
+    temp = np.zeros(shape=(7, numColumns))
+    instance = temp
+    for j in range(0, len(chunksList[i])):
+        # if j==len(chunksList[i])-1:
+        #     print i
+            # print j
+            # print instance
+            # print sub9HypoChunk
+            # print 5*"-"
+        if j<7:
+            instance[j][:] = chunksList[i][j][:]
+            sub2HypoChunk[j][0] = sub2HypoChunkList[i][j][0]
+        else:
+            # for k in range(0, np.size(instance, 0)):
+            #     for l in range(0, 8):
+			if counter < 9:
+				isRight = False
+				oneExists = False
+				predictForest = subForest.predict(instance)
+				for k in range(0, 7):
+					if sub2HypoChunk[k][0] > 0.5:
+						oneExists = True
+				if oneExists:
+					for k in range(0, len(predictForest)):
+						if predictForest[k] > 0:
+							isRight = True
+				else:
+					isRight = True
+					for k in range(0, len(predictForest)):
+						if predictForest[k] > 0.:
+							isRight = False
+				if isRight:
+						numberCorrect += 1
+				print predictForest
+				print sub2HypoChunk
+				print "Correct: ", isRight
+				print subForest.predict_proba(instance)
+				numTotal += 1
+				print "\n"
+			tempNum = j%7-1
+			instance = np.delete(instance, tempNum, 0)
+			sub2HypoChunk = np.delete(sub2HypoChunk, tempNum, 0)
+			instance = np.vstack((instance, chunksList[i][j][:]))
+			sub2HypoChunk = np.vstack((sub2HypoChunk, sub2HypoChunkList[i][j][0]))
+			counter += 1
+print "number correct: ", numberCorrect
+print "total: ", numTotal

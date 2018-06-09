@@ -507,6 +507,69 @@ for f in range(SUB9.shape[1]):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 print "\n"
 
+FTEST = np.zeros(shape=(1, numColumns)) # used to break each into instances
+TEMPFTESTLIST = [] # used to get all the data from gen test instances file
+FTESTLIST = [] # actual list containing all FTESTs
+with open('general_test_instances.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            if featureNum > 6:
+           	  lineWords.append(float(word))
+           	  featureNum += 1
+            else:
+              featureNum += 1
+            # print lineWords
+
+        TEMPFTESTLIST.append(lineWords)
+
+for i  in range(0, np.size(TEMPFTESTLIST, 0)):
+	temp = np.zeros(shape=(1, numColumns))
+	FTEST = temp
+	for j in range(0, 7):
+		tempRow = []
+		for k in range(0, 8):
+			tempRow.append(TEMPFTESTLIST[i][j+7*k])
+		# print tempRow
+		# print np.shape(tempRow)
+		if j == 0:
+			FTEST[0] = tempRow
+		else:
+			FTEST = np.vstack((FTEST, tempRow))
+	FTESTLIST.append(FTEST)
+
+# print FTESTLIST[0]
+# print "\n"
+# print FTESTLIST[0][0]
+# print FTESTLIST[0][1]
+print "Starting General Population Test"
+print 32*"-"
+predictX = []
+for i in range(0, np.size(FTESTLIST, 0)):
+	isOne = False
+	predictForest = subForest.predict(FTESTLIST[i])
+	predictForestProb = subForest.predict_proba(FTESTLIST[i])
+	xAccuracy.append(np.amax(predictForestProb))
+	for k in range(0, len(predictForest)):
+		if predictForest[k] > 0.5:
+			isOne = True
+	if isOne:
+		predictX.append(1)
+	else:
+		predictX.append(0)
+	if i%100 == 0:
+		print i
+
+f3 = open('general_pred1.csv', 'w')
+for i in range(0, len(predictX)):
+	stringVar = str(xAccuracy[i]) + "," + str(predictX[i]) + "\n"
+	f3.write(stringVar)
+f3.close()
+
+exit() # comment out to run sample tests and verification tests on subject 2 data
+
 TEST1 = np.zeros(shape=(1, numColumns)) 
 firstLine = True
 with open('sampleinstance_1.csv','r') as f:
@@ -736,7 +799,7 @@ falseP = 0 # false positives
 falseN = 0 # false negatives
 correctP = 1 # correct positives aka correct when hypo event will happen
 correctN = 4 # correct negatives aka correct when there isn't a hypo event
-numInstances = 5 # number of instances from Subject 2 to run, 295 takes quite a while to run
+numInstances = 1 # number of instances from Subject 2 to run, 295 takes quite a while to run
 for i in range(0, len(chunksList)):
     temp2 = np.zeros(shape=(7,1))
     sub2HypoChunk = temp2
@@ -820,15 +883,7 @@ print "Precision: ", precisionP
 print "Recall: ", recallR
 print "F-measure: ", fMeasure
 print "Accuracy: ", wAccuracy
-# tpRate = correctP/(correctP+falseN) # true positive rate
-# fpRate = falseP/(falseP + correctN) # false positive rate
-# print y
-# print X
-# fp_rate, tp_rate, thresholds = roc_curve(y, X)
-# print fp_rate
-# print tp_rate
-# print thresholds
-# print "Auc: ", auc(fp_rate, tp_rate)
+
 rocScore = roc_auc_score(y, X)
 print "Area under ROC: ", rocScore
 print "total: ", numTotal

@@ -211,7 +211,7 @@ for i in range(0, np.size(FTESTLIST, 0)): # np.size(FTESTLIST, 0)
 	if i%10 == 0:
 		print i
 
-f3 = open('subject1_pred1.csv', 'w')
+f3 = open('individual1_pred1.csv', 'w')
 for i in range(0, len(predictX)):
 	stringVar = str(xAccuracy[i]) + "," + str(predictX[i]) + "\n"
 	f3.write(stringVar)

@@ -149,13 +149,13 @@ print "Subject_2"
 
 # subForest.fit(SUB1, np.ravel(SUB1HYPO))
 # print subForest.feature_importances_
-importances = subForest.feature_importances_
-std = np.std([tree.feature_importances_ for tree in subForest.estimators_],
-             axis=0)
-indices = np.argsort(importances)[::-1]
-for f in range(SUB1.shape[1]):
-    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
-print "\n"
+# importances = subForest.feature_importances_
+# std = np.std([tree.feature_importances_ for tree in subForest.estimators_],
+#              axis=0)
+# indices = np.argsort(importances)[::-1]
+# for f in range(SUB1.shape[1]):
+#     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+# print "\n"
 
 FTEST = np.zeros(shape=(1, numColumns)) # used to break each into instances
 TEMPFTESTLIST = [] # used to get all the data from gen test instances file

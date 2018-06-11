@@ -854,12 +854,12 @@ for i in range(0, len(allgenInstances)):
     elif(probability[i] < 50):
         probability[i] = 100-(2*probability[i])
 
-f = open("probs_and_preds.csv", "w")
+f = open("individual2_pred2.csv", "w")
 for x in zip(probability,predictions):
     f.write("{},{}\n".format(x[0][0], x[1][0]))
 f.close()
 
-f = open("actual_output.csv", "w")
+f = open("individual2_actual_output.csv", "w")
 for x in zip(firstResults,secondResults,thirdResults,fourthResults):
     f.write("{},{},{},{}\n".format(x[0], x[1], x[2], x[3]))
 f.close()

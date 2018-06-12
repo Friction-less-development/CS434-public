@@ -6,7 +6,6 @@ import matplotlib.patches as mpatches
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import auc, roc_curve, roc_auc_score
-from sklearn.neural_network import MLPClassifier
 
 numColumns = 8
 instance = np.zeros(shape=(7, numColumns))

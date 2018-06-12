@@ -1,0 +1,11 @@
+number correct: 2585
+correct positives: 19
+false negatives: 14
+false positives: 356
+correct negatives: 2566
+Precision: 0.0506666666667
+Recall: 0.575757575758
+F-measure: 0.093137254902
+Accuracy: 0.874788494078
+Area under ROC: 0.726961607865
+total: 2955

@@ -62,7 +62,7 @@ with open('Subject_7_part1.csv','r') as f:
         	SUB1HYPO = np.vstack((SUB1HYPO, averageValue))
 
 firstLine = True
-with open('list_1.csv','r') as f:
+with open('list_7_part1.csv','r') as f:
     for line in f:
     	lineWords = []
         for word in line.split(','):

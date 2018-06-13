@@ -75,9 +75,10 @@ with open('list_7_part1.csv','r') as f:
         	SUB1INDICES = np.vstack((SUB1INDICES, lineWords))
 classWeights = compute_class_weight("balanced", [0., 1.], np.ravel(SUB1HYPO))
 # print classWeights
-classWeights[0] = classWeights[0]/126. # can only put class weight of 0 in, so divide it by the wiehgt of class weight of 1, more or less.
+classWeights[0] = classWeights[0]/classWeights[1] # can only put class weight of 0 in, so divide it by the wiehgt of class weight of 1, more or less.
+# print classWeights
 counter = 0 # must get to at least equaling 6, which is a minimum of 7 instances for a 30 minute period
-subForest = RandomForestClassifier(criterion="entropy", max_depth=7, max_features=6, random_state=0, warm_start=True, bootstrap=True, class_weight={0.:classWeights[0]}) # class_weight={0.:classWeights[0]}
+subForest = RandomForestClassifier(criterion="entropy", max_depth=7, max_features=6, random_state=0, warm_start=True, bootstrap=False, class_weight={0.:classWeights[0]}) # class_weight={0.:classWeights[0]}
 
 sub1HypoChunk = np.zeros(shape=(1,1))
 for i in range (0, np.size(SUB1,0)):
@@ -211,7 +212,7 @@ for i in range(0, np.size(FTESTLIST, 0)): # np.size(FTESTLIST, 0)
 	if i%10 == 0:
 		print i
 
-f3 = open('individual1_pred1T.csv', 'w') # Temp
+f3 = open('individual1_pred1.csv', 'w')
 for i in range(0, len(predictX)):
 	stringVar = str(xAccuracy[i]) + "," + str(predictX[i]) + "\n"
 	f3.write(stringVar)

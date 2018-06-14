@@ -12,6 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 numColumns = 8
 instance = np.zeros(shape=(7, numColumns))
@@ -22,8 +23,8 @@ sub4HypoChunkList = []
 sub6HypoChunkList = []
 sub9HypoChunkList = []
 sub2HypoChunkList = [] # for verification subject
-generalPopX = []
-generalPopy = []
+X = []
+y = []
 SUB1 = np.zeros(shape=(1, numColumns))
 SUB1HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 minutes or not (what we're trying to predict)
 SUB1INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 1
@@ -115,8 +116,8 @@ for i in range(0, len(chunksList)):
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
-            generalPopX.append(np.ravel(instance))
-            generalPopy.append(sub1HypoChunk[6])
+            X.append(np.ravel(instance))
+            y.append(sub1HypoChunk[6])
             tempNum = j%7-1
             instance = np.delete(instance, tempNum, 0)
             sub1HypoChunk = np.delete(sub1HypoChunk, tempNum, 0)
@@ -224,8 +225,8 @@ for i in range(0, len(chunksList)):
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
-            generalPopX.append(np.ravel(instance))
-            generalPopy.append(sub1HypoChunk[6])
+            X.append(np.ravel(instance))
+            y.append(sub1HypoChunk[6])
             tempNum = j%7-1
             instance = np.delete(instance, tempNum, 0)
             sub4HypoChunk = np.delete(sub4HypoChunk, tempNum, 0)
@@ -334,8 +335,8 @@ for i in range(0, len(chunksList)):
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
-            generalPopX.append(np.ravel(instance))
-            generalPopy.append(sub1HypoChunk[6])
+            X.append(np.ravel(instance))
+            y.append(sub1HypoChunk[6])
             tempNum = j%7-1
             instance = np.delete(instance, tempNum, 0)
             sub6HypoChunk = np.delete(sub6HypoChunk, tempNum, 0)
@@ -444,8 +445,8 @@ for i in range(0, len(chunksList)):
         else:
             # for k in range(0, np.size(instance, 0)):
             #     for l in range(0, 8):
-            generalPopX.append(np.ravel(instance))
-            generalPopy.append(sub1HypoChunk[6])
+            X.append(np.ravel(instance))
+            y.append(sub1HypoChunk[6])
             tempNum = j%7-1
             instance = np.delete(instance, tempNum, 0)
             sub9HypoChunk = np.delete(sub9HypoChunk, tempNum, 0)
@@ -457,44 +458,97 @@ print "Done.\n"
 
 print "Calculating logistic regression . . . \n"
 
-generalPopX = np.array(generalPopX)
-generalPopy = np.ravel(np.array(generalPopy))
-# x, y, z = generalPopX.shape
-# generalPopX = generalPopX.reshape(x, y*z)
+X = np.array(X)
+y = np.ravel(np.array(y))
+# x, y, z = X.shape
+# X = X.reshape(x, y*z)
 
-print "Shape of X: ", generalPopX.shape
-print "Shape of y: ", generalPopy.shape
+print "Shape of X: ", X.shape
+print "Shape of y: ", y.shape
 
 print "fitting model"
 logreg = LogisticRegression()
-# logreg.fit(generalPopX, generalPopy)
+X = StandardScaler().fit_transform(X)
+logreg.fit(X, y)
 
-X_train, X_test, y_train, y_test = train_test_split(generalPopX, generalPopy, test_size=0.3, random_state=0)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+# X_train, X_test, y_train, y_test = train_test_split(StandardScaler().fit_transform(X), y, test_size=0.33, random_state=42)
+#
+# print "num 1s genPop, y train, y test"
+#
+# n = np.array(np.where(y == 1))
+# print n.shape
+#
+# n1 = np.array(np.where(y_train == 1))
+# print n1.shape
+#
+# n1 = np.array(np.where(y_test == 1))
+# print n1.shape
+#
+#
+# logreg.fit(X_train, y_train)
+# y_pred = logreg.predict(X_test)
+# print("Accuracy: ", logreg.score(X_test, y_test))
+# print "Confusion matrix: "
+# print "[[ TN  FP]"
+# print " [ FN  TP]]"
+# confusion_matrix = confusion_matrix(y_test, y_pred)
+# print(confusion_matrix)
+# print(classification_report(y_test, y_pred))
+# logit_roc_auc = roc_auc_score(y_test, logreg.predict(X_test))
+# print "ROC score: ", logit_roc_auc
+#
+# # print "\n\n Model coefs: "
+# # print logreg.coef_
+# print "\n\n"
 
-print "num 1s genPop, y train, y test"
+FTEST = np.zeros(shape=(1, numColumns)) # used to break each into instances
+TEMPFTESTLIST = [] # used to get all the data from gen test instances file
+FTESTLIST = [] # actual list containing all FTESTs
+with open('general_test_instances.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            lineWords.append(float(word))
+            featureNum += 1
+            # print lineWords
 
-n = np.array(np.where(generalPopy == 1))
-print n.shape
+        TEMPFTESTLIST.append(lineWords)
 
-n1 = np.array(np.where(y_train == 1))
-print n1.shape
+for i  in range(0, np.size(TEMPFTESTLIST, 0)):
+	temp = np.zeros(shape=(1, numColumns))
+	FTEST = temp
+	for j in range(0, 7):
+		tempRow = []
+		for k in range(0, numColumns):
+			tempRow.append(TEMPFTESTLIST[i][j+7*k])
+		# print tempRow
+		# print np.shape(tempRow)
+		if j == 0:
+			FTEST[0] = tempRow
+		else:
+			FTEST = np.vstack((FTEST, tempRow))
+	FTESTLIST.append(FTEST)
 
-n1 = np.array(np.where(y_test == 1))
-print n1.shape
+print np.shape(FTESTLIST)
 
+print "Starting Subject general pop Test"
+print 32*"-"
+predictX = []
+xAccuracy = []
 
-logreg.fit(X_train, y_train)
+X_test = []
+
+for i in range(0, np.size(FTESTLIST, 0)): # np.size(FTESTLIST, 0)
+    X_test.append(np.ravel(FTESTLIST[i]))
+
 y_pred = logreg.predict(X_test)
-print("Accuracy: ", logreg.score(X_test, y_test))
-print "Confusion matrix: "
-print "[[ TN  FP]"
-print " [ FN  TP]]"
-confusion_matrix = confusion_matrix(y_test, y_pred)
-print(confusion_matrix)
-print(classification_report(y_test, y_pred))
-logit_roc_auc = roc_auc_score(y_test, logreg.predict(X_test))
-print "ROC score: ", logit_roc_auc
+y_score = logreg.decision_function(X_test)
 
-# print "\n\n Model coefs: "
-# print logreg.coef_
-print "\n\n"
+f3 = open('general_pred3.csv', 'w')
+for i in range(0, len(y_pred)):
+	stringVar = str(y_score[i]) + "," + str(int(y_pred[i])) + "\n"
+	f3.write(stringVar)
+f3.close()

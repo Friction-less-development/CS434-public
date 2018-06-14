@@ -12,14 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
-#How to Run: python fp1_tree.py
-#Purpose of program: Final project for Individual Test Subject 7 using decision tree as our model
-
-# Sources:
-#           http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
-#           https://stackoverflow.com/questions/42757892/how-to-use-warm-start
-#			https://stackoverflow.com/questions/31159157/different-result-with-roc-auc-score-and-auc
-#           https://stackoverflow.com/questions/4770297/convert-utc-datetime-string-to-local-datetime-with-python
+from sklearn.preprocessing import StandardScaler
 
 
 from_zone = tz.tzutc()
@@ -38,7 +31,7 @@ SUB1HYPO = np.zeros(shape=(1,1)) # this is whether there will be a hypo in 30 mi
 SUB1INDICES = np.zeros(shape=(1,1)) # this will hold the indices for subject 1
 
 firstLine = True
-with open('Subject_7_part1.csv','r') as f:
+with open('Subject_2_part1.csv','r') as f:
     for line in f:
         featureNum = 0
         lineWords = []
@@ -67,7 +60,7 @@ with open('Subject_7_part1.csv','r') as f:
 
 firstLine = True
 # indice file. Should be list7_part1 for subject 7
-with open('list_7_part1.csv','r') as f:
+with open('list2_part1.csv','r') as f:
     for line in f:
     	lineWords = []
         for word in line.split(','):
@@ -159,34 +152,85 @@ for i in range(0, len(chunksList)): # len(chunksList)
 
 # print(instance.shape)
 
-subject7X = np.array(subject7X)
-subject7y = np.ravel(np.array(subject7y))
+X = np.array(subject7X)
+y = np.ravel(np.array(subject7y))
 # x, y, z = subject7X.shape
 # subject7X = subject7X.reshape(x, y*z)
 
 print "\n"
-print "Subject_7"
+print "Subject_2"
 
-print "Shape of X: ", subject7X.shape
-print "Shape of y: ", subject7y.shape
+
 
 print "fitting model"
 logreg = LogisticRegression()
-# logreg.fit(subject7X, subject7y)
+X = StandardScaler().fit_transform(X)
+logreg.fit(X, y)
 
-X_train, X_test, y_train, y_test = train_test_split(subject7X, subject7y, test_size=0.3, random_state=0)
-logreg.fit(X_train, y_train)
+FTEST = np.zeros(shape=(1, numColumns)) # used to break each into instances
+TEMPFTESTLIST = [] # used to get all the data from gen test instances file
+FTESTLIST = [] # actual list containing all FTESTs
+with open('subject2_instances.csv','r') as f:
+    for line in f:
+        featureNum = 0
+        lineWords = []
+        averageValue = []
+        for word in line.split(','):
+            lineWords.append(float(word))
+            featureNum += 1
+            # print lineWords
+
+        TEMPFTESTLIST.append(lineWords)
+
+for i  in range(0, np.size(TEMPFTESTLIST, 0)):
+	temp = np.zeros(shape=(1, numColumns))
+	FTEST = temp
+	for j in range(0, 7):
+		tempRow = []
+		for k in range(0, numColumns):
+			tempRow.append(TEMPFTESTLIST[i][j+7*k])
+		# print tempRow
+		# print np.shape(tempRow)
+		if j == 0:
+			FTEST[0] = tempRow
+		else:
+			FTEST = np.vstack((FTEST, tempRow))
+	FTESTLIST.append(FTEST)
+
+print np.shape(FTESTLIST)
+
+print "Starting Subject 2 Test"
+print 32*"-"
+predictX = []
+xAccuracy = []
+
+X_test = []
+
+for i in range(0, np.size(FTESTLIST, 0)): # np.size(FTESTLIST, 0)
+    X_test.append(np.ravel(FTESTLIST[i]))
+
 y_pred = logreg.predict(X_test)
-print("Accuracy: ", logreg.score(X_test, y_test))
-print "Confusion matrix: "
-print "[[ TN  FP]"
-print " [ FN  TP]]"
-confusion_matrix = confusion_matrix(y_test, y_pred)
-print(confusion_matrix)
-print(classification_report(y_test, y_pred))
-logit_roc_auc = roc_auc_score(y_test, logreg.predict(X_test))
-print "ROC score: ", logit_roc_auc
+y_score = logreg.decision_function(X_test)
 
-print "\n\n Model coefs: "
-print logreg.coef_
-print "\n\n"
+f3 = open('individual1_pred3.csv', 'w')
+for i in range(0, len(y_pred)):
+	stringVar = str(y_score[i]) + "," + str(int(y_pred[i])) + "\n"
+	f3.write(stringVar)
+f3.close()
+
+# X_train, X_test, y_train, y_test = train_test_split(subject7X, subject7y, test_size=0.3, random_state=0)
+# logreg.fit(X_train, y_train)
+# y_pred = logreg.predict(X_test)
+# print("Accuracy: ", logreg.score(X_test, y_test))
+# print "Confusion matrix: "
+# print "[[ TN  FP]"
+# print " [ FN  TP]]"
+# confusion_matrix = confusion_matrix(y_test, y_pred)
+# print(confusion_matrix)
+# print(classification_report(y_test, y_pred))
+# logit_roc_auc = roc_auc_score(y_test, logreg.predict(X_test))
+# print "ROC score: ", logit_roc_auc
+#
+# print "\n\n Model coefs: "
+# print logreg.coef_
+# print "\n\n"
